@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;0,600;1,500&display=swap');
 :root{--navy:#082d52;--navy-deep:#031f3b;--blue:#123e65;--gold:#c9a44f;--yellow:#f2ba48;--cream:#f7f3e8;--paper:#fffdf8;--ink:#153b42;--muted:#6d7775;--line:#ded7c6;--page-scroll:0px}
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:76px}body{margin:0;background:var(--paper);color:var(--ink);font-family:Montserrat,Arial,sans-serif;overflow-x:hidden}a{text-decoration:none;color:inherit}button,input{font:inherit}a:focus-visible,button:focus-visible{outline:3px solid var(--yellow);outline-offset:4px}.progressBar{position:fixed;left:0;top:0;height:3px;background:var(--yellow);z-index:100;transition:width .1s linear}.topbar{height:76px;padding:8px 18px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,253,248,.96);position:sticky;top:0;z-index:50;border-bottom:1px solid rgba(8,45,82,.1);backdrop-filter:blur(16px)}.brand{display:flex;width:132px;height:54px;align-items:center}.brand img{width:100%;height:100%;object-fit:contain}.menuButton{width:44px;height:44px;border:0;background:transparent;display:grid;place-content:center;gap:6px;cursor:pointer}.menuButton span{display:block;width:24px;height:1px;background:var(--navy);transition:.2s}.menuButton[aria-expanded="true"] span:first-child{transform:translateY(3.5px) rotate(45deg)}.menuButton[aria-expanded="true"] span:last-child{transform:translateY(-3.5px) rotate(-45deg)}.nav{position:absolute;left:0;right:0;top:76px;background:var(--paper);padding:20px 22px 28px;display:none;flex-direction:column;gap:0;border-bottom:1px solid var(--line);box-shadow:0 20px 40px #082d5218}.nav.open{display:flex;animation:menuIn .25s ease}.nav a{padding:15px 2px;border-bottom:1px solid #e8e3d8;color:var(--navy);font-size:13px;font-weight:600}.navCta{margin-top:12px!important;background:var(--yellow);padding:16px!important;text-align:center;border:0!important}.eyebrow{font-size:10px;font-weight:600;letter-spacing:.23em;color:var(--yellow);margin:0 0 18px}.eyebrow.dark{color:#997526}h1,h2,h3{font-family:"Playfair Display",Georgia,serif}.button{border:0;display:inline-flex;align-items:center;justify-content:space-between;gap:24px;padding:17px 19px;font-size:11px;font-weight:600;letter-spacing:.04em}.button.primary{background:var(--yellow);color:var(--navy)}.button span{transition:.2s}.button:hover span{transform:translateX(4px)}
 
@@ -27,3 +26,43 @@ footer{padding:40px 22px 92px;background:var(--paper);text-align:center}.footerB
 @media(min-width:1040px){.signup{grid-template-columns:minmax(0,1fr) 520px}.signupCopy{max-width:720px}.signupCopy h2{font-size:58px}.instagramReasons{max-width:610px}.instagramReasons>div{grid-template-columns:42px 1fr;padding:17px 0}.instagramVisual{height:650px;margin:0}.phoneMockup{width:310px;height:598px}.tagOne{left:12px;top:100px}.tagTwo{right:0;bottom:85px}}
 
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}[data-reveal]{opacity:1;transform:none}}
+
+/* Política de Privacidade */
+.legalPage{background:var(--cream)}
+.legalTopbar{height:76px;padding:8px 18px;display:flex;align-items:center;justify-content:space-between;background:rgba(255,253,248,.97);border-bottom:1px solid rgba(8,45,82,.1);position:sticky;top:0;z-index:20;backdrop-filter:blur(16px)}
+.legalTopbar .brand{width:132px;height:54px}
+.legalTopbar .brand img{width:100%;height:100%;object-fit:contain}
+.legalBack{display:inline-flex;align-items:center;gap:9px;padding:12px 14px;border:1px solid rgba(8,45,82,.22);color:var(--navy);font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:.2s}
+.legalBack:hover{background:var(--navy);color:white}
+.privacyHero{padding:70px 22px 72px;background:var(--navy);color:white;position:relative;overflow:hidden}
+.privacyHero:after{content:"";position:absolute;width:360px;height:360px;border:1px solid rgba(201,164,79,.22);border-radius:50%;right:-190px;top:-210px;box-shadow:0 0 0 50px rgba(255,255,255,.02),0 0 0 100px rgba(255,255,255,.015)}
+.privacyHero>div{position:relative;z-index:1;max-width:920px;margin:0 auto}
+.privacyHero h1{font-size:clamp(44px,12vw,72px);line-height:1.02;letter-spacing:-.04em;font-weight:500;margin:0;color:white}
+.privacyHero h1 em{font-weight:500;color:#f3e3b4}
+.privacyLead{max-width:720px;margin:24px 0 0;font:17px/1.7 Georgia,serif;color:#d3dfe2}
+.privacyMeta{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:28px;color:#a9beca;font-size:8px;letter-spacing:.11em;text-transform:uppercase}
+.privacyMeta span+span:before{content:"•";margin-right:16px;color:var(--gold)}
+.privacyShell{max-width:1120px;margin:0 auto;padding:58px 22px 78px;display:grid;gap:38px}
+.privacyToc{padding:24px;background:var(--paper);border:1px solid var(--line);box-shadow:7px 7px 0 rgba(201,164,79,.55)}
+.privacyToc strong{display:block;color:#997526;font-size:9px;letter-spacing:.17em;text-transform:uppercase;margin-bottom:16px}
+.privacyToc nav{display:grid;gap:0}
+.privacyToc a{padding:10px 0;border-bottom:1px solid #e7e1d5;color:var(--navy);font-size:11px;line-height:1.4}
+.privacyToc a:last-child{border-bottom:0}
+.privacyContent{min-width:0}
+.privacyIntro{padding:24px;background:var(--paper);border-left:4px solid var(--gold);font:16px/1.7 Georgia,serif;color:var(--ink);margin:0 0 40px}
+.privacyContent section{scroll-margin-top:96px;padding:0 0 36px;margin:0 0 36px;border-bottom:1px solid #d8cfbe}
+.privacyContent section:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.privacyContent h2{font:500 clamp(28px,7vw,38px)/1.12 "Playfair Display",Georgia,serif;color:var(--navy);letter-spacing:-.025em;margin:0 0 18px}
+.privacyContent h3{font:500 21px/1.3 "Playfair Display",Georgia,serif;color:var(--navy);margin:25px 0 10px}
+.privacyContent p,.privacyContent li{font-size:13px;line-height:1.8;color:#566766}
+.privacyContent p{margin:0 0 14px}
+.privacyContent ul{margin:14px 0 0;padding-left:20px}
+.privacyContent li+li{margin-top:8px}
+.privacyContent a{color:#85661d;text-decoration:underline;text-underline-offset:3px}
+.privacyContent strong{color:var(--ink)}
+.privacyNote{padding:20px;background:#eee5cf;border:1px solid #d8c79e;margin-top:20px}
+.privacyNote p{margin:0;color:#4e5d5c}
+.legalPage footer{padding-bottom:42px}
+
+@media(min-width:760px){.legalTopbar{height:88px;padding:10px 5vw}.legalTopbar .brand{width:158px;height:64px}.privacyHero{padding:95px 7vw}.privacyShell{padding:78px 7vw 105px}.privacyIntro{padding:30px}.privacyContent p,.privacyContent li{font-size:14px}}
+@media(min-width:1040px){.legalTopbar{height:92px;padding:10px clamp(45px,6vw,92px)}.legalTopbar .brand{width:172px;height:70px}.privacyHero{padding:110px clamp(45px,8vw,130px)}.privacyHero>div{max-width:1120px}.privacyHero h1{font-size:76px;max-width:780px}.privacyLead{font-size:19px}.privacyShell{grid-template-columns:250px minmax(0,1fr);gap:80px;padding:92px clamp(45px,8vw,130px) 125px}.privacyToc{position:sticky;top:125px;align-self:start}.privacyContent h2{font-size:40px}.legalPage footer{padding-bottom:52px}}
