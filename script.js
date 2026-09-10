@@ -1,153 +1,3 @@
-const profiles = [
-  { key: "dores", icon: "↕", label: "Acordo com dores", short: "Sinto desconforto principalmente na lombar, ombros ou quadril.", result: "suporte alinhado e alívio de pressão" },
-  { key: "calor", icon: "≈", label: "Sinto muito calor", short: "Acordo durante a noite procurando um lado mais fresco.", result: "respirabilidade e conforto térmico" },
-  { key: "movimento", icon: "◌", label: "Percebo cada movimento", short: "Qualquer mudança de posição atrapalha a continuidade do sono.", result: "estabilidade e independência de movimentos" },
-  { key: "aconchego", icon: "◇", label: "Não encontro conforto", short: "Demoro a relaxar e parece que o corpo nunca se acomoda.", result: "acolhimento com sustentação" },
-];
-
-const sleepPositions = [
-  { key: "lado", label: "De lado", icon: "◒", note: "atenção ao encaixe dos ombros e quadril" },
-  { key: "costas", label: "De costas", icon: "—", note: "atenção ao suporte da região lombar" },
-  { key: "brucos", label: "De bruços", icon: "▰", note: "atenção para evitar afundamento excessivo" },
-  { key: "vario", label: "Mudo bastante", icon: "↻", note: "atenção à facilidade para trocar de posição" },
-];
-
-const comfortFeels = [
-  { key: "macio", label: "Mais macio", note: "Gosto de sentir o corpo sendo acolhido." },
-  { key: "equilibrado", label: "Equilibrado", note: "Quero sustentação sem perder o aconchego." },
-  { key: "firme", label: "Mais firme", note: "Prefiro uma superfície estável, com menos afundamento." },
-  { key: "nao-sei", label: "Ainda não sei", note: "Quero experimentar e comparar antes de decidir." },
-];
-
-const sleepModes = [
-  { key: "sozinho", label: "Durmo sozinho", note: "A recomendação pode ser totalmente focada em você." },
-  { key: "casal-parecido", label: "Em casal, gostos parecidos", note: "Podemos buscar uma sensação confortável para os dois." },
-  { key: "casal-diferente", label: "Em casal, gostos diferentes", note: "Precisamos equilibrar biotipos, movimentos e preferências." },
-];
-
-const state = {
-  profile: "",
-  position: "",
-  comfort: "",
-  sleepMode: "",
-  step: 0,
-};
-
-const quizStage = document.querySelector("#quiz-stage");
-const quizCounter = document.querySelector("#quiz-counter");
-const quizTrack = document.querySelector("#quiz-track");
-
-function getItem(items, key) {
-  return items.find((item) => item.key === key);
-}
-
-function optionButton(item, type) {
-  const selected = state[type] === item.key;
-
-  if (type === "profile") {
-    return `<button type="button" class="profile${selected ? " selected" : ""}" data-type="profile" data-key="${item.key}">
-      <i>${item.icon}</i><h3>${item.label}</h3><p>${item.short}</p><span>${selected ? "Selecionado ✓" : "Escolher →"}</span>
-    </button>`;
-  }
-
-  if (type === "position") {
-    return `<button type="button" class="${selected ? "selected" : ""}" data-type="position" data-key="${item.key}">
-      <i>${item.icon}</i><div><h3>${item.label}</h3><p>${item.note}</p></div><span>→</span>
-    </button>`;
-  }
-
-  if (type === "comfort") {
-    return `<button type="button" class="${selected ? "selected" : ""}" data-type="comfort" data-key="${item.key}">
-      <span class="feelIcon ${item.key}"><i></i></span><h3>${item.label}</h3><p>${item.note}</p><b>Escolher →</b>
-    </button>`;
-  }
-
-  return `<button type="button" class="${selected ? "selected" : ""}" data-type="sleepMode" data-key="${item.key}">
-    <i>${item.key === "sozinho" ? "○" : "○○"}</i><div><h3>${item.label}</h3><p>${item.note}</p></div><span>→</span>
-  </button>`;
-}
-
-function questionHeader(number, small, title, text) {
-  return `<div class="quizQuestion"><span>${number}</span><div><small>${small}</small><h3>${title}</h3><p>${text}</p></div></div>`;
-}
-
-function renderQuestion() {
-  let content = "";
-
-  if (state.step === 0) {
-    content = `${questionHeader("01", "COMECE PELA SUA MANHÃ", "O que mais incomoda quando você acorda?", "Pense no problema que mais se repete, mesmo que nem sempre aconteça.")}
-      <div class="quizOptions profileGrid">${profiles.map((item) => optionButton(item, "profile")).join("")}</div>`;
-  } else if (state.step === 1) {
-    content = `${questionHeader("02", "AGORA PENSE NO SEU CORPO", "Em qual posição você passa mais tempo?", "A posição muda onde o corpo concentra pressão e como a coluna precisa ser sustentada.")}
-      <div class="quizOptions positionCards">${sleepPositions.map((item) => optionButton(item, "position")).join("")}</div>`;
-  } else if (state.step === 2) {
-    content = `${questionHeader("03", "NÃO EXISTE RESPOSTA CERTA", "Qual sensação parece mais confortável?", "Essa preferência será combinada com o suporte que seu corpo precisa.")}
-      <div class="quizOptions comfortCards">${comfortFeels.map((item) => optionButton(item, "comfort")).join("")}</div>`;
-  } else {
-    content = `${questionHeader("04", "ÚLTIMA PISTA", "Esse colchão será usado por quem?", "Quando duas pessoas dividem a cama, movimentos, biotipos e preferências também entram na escolha.")}
-      <div class="quizOptions modeCards">${sleepModes.map((item) => optionButton(item, "sleepMode")).join("")}</div>`;
-  }
-
-  quizStage.innerHTML = `<div class="quizStage">${content}${state.step > 0 ? '<button type="button" class="quizBack" data-action="back">← Voltar uma pergunta</button>' : ""}</div>`;
-}
-
-function renderResult() {
-  const profile = getItem(profiles, state.profile);
-  const position = getItem(sleepPositions, state.position);
-  const comfort = getItem(comfortFeels, state.comfort);
-  const mode = getItem(sleepModes, state.sleepMode);
-
-  quizStage.innerHTML = `<div class="result" role="status">
-    <div class="resultStamp"><span>SEU MAPA DE CONFORTO</span><strong>O seu ponto de partida é:</strong><h3>${profile.result}</h3></div>
-    <div class="resultSignals">
-      <div><span>POSIÇÃO</span><b>${position.label}</b><p>${position.note}</p></div>
-      <div><span>SENSAÇÃO</span><b>${comfort.label}</b><p>${comfort.note}</p></div>
-      <div><span>USO</span><b>${mode.label}</b><p>${mode.note}</p></div>
-    </div>
-    <div class="resultAdvice"><span>O QUE VAMOS OBSERVAR NA LOJA</span><p>Distribuição de pressão, sustentação, adaptação ao corpo e a sensação que faz você relaxar — sempre considerando também peso e altura de quem vai usar.</p><small>Este resultado orienta a conversa, mas não substitui experimentar o colchão.</small></div>
-    <div class="resultActions"><a href="#contato">Acompanhar a LS até a abertura <span>→</span></a><button type="button" data-action="reset">Refazer experiência</button></div>
-  </div>`;
-}
-
-function renderQuiz() {
-  const complete = Boolean(state.profile && state.position && state.comfort && state.sleepMode);
-  quizCounter.textContent = complete ? "PERFIL PRONTO" : `0${state.step + 1} DE 04`;
-  quizTrack.style.width = complete ? "100%" : `${((state.step + 1) / 4) * 100}%`;
-
-  if (complete) renderResult();
-  else renderQuestion();
-}
-
-quizStage.addEventListener("click", (event) => {
-  const button = event.target.closest("button");
-  if (!button) return;
-
-  if (button.dataset.action === "back") {
-    state.step = Math.max(0, state.step - 1);
-    renderQuiz();
-    return;
-  }
-
-  if (button.dataset.action === "reset") {
-    Object.assign(state, { profile: "", position: "", comfort: "", sleepMode: "", step: 0 });
-    renderQuiz();
-    return;
-  }
-
-  const { type, key } = button.dataset;
-  if (!type || !key) return;
-
-  state[type] = key;
-  renderQuiz();
-
-  if (type !== "sleepMode") {
-    window.setTimeout(() => {
-      state.step = Math.min(3, state.step + 1);
-      renderQuiz();
-    }, 180);
-  }
-});
-
 document.querySelectorAll(".faqList article").forEach((article) => {
   const button = article.querySelector("button");
   const icon = button.querySelector("i");
@@ -216,4 +66,158 @@ function updateScrollProgress() {
 updateScrollProgress();
 window.addEventListener("scroll", updateScrollProgress, { passive: true });
 window.addEventListener("resize", updateScrollProgress);
-renderQuiz();
+
+/* ---------- Produtos ---------- */
+// O preço NÃO é exibido publicamente — fica só no catálogo interno (admin.html),
+// para os consultores consultarem e passarem o valor ao cliente.
+const productGrid = document.querySelector("#product-grid");
+const productFiltersEl = document.querySelector("#product-filters");
+let activeCategory = "Todos";
+let produtosAtuais = typeof produtosFallback !== "undefined" ? produtosFallback : [];
+
+function renderProductFilters() {
+  if (!productFiltersEl) return;
+  const categories = ["Todos", ...new Set(produtosAtuais.map((item) => item.categoria))];
+  productFiltersEl.innerHTML = categories
+    .map((cat) => `<button type="button" class="${cat === activeCategory ? "active" : ""}" data-cat="${cat}">${cat}</button>`)
+    .join("");
+}
+
+function renderProducts() {
+  if (!productGrid) return;
+  const list = activeCategory === "Todos" ? produtosAtuais : produtosAtuais.filter((item) => item.categoria === activeCategory);
+  productGrid.innerHTML = list
+    .map((item) => `<article class="productCard">
+      ${item.foto_url ? `<img class="productPhoto" src="${item.foto_url}" alt="${item.nome}" loading="lazy">` : `<div class="productPhoto productPhotoEmpty" aria-hidden="true"></div>`}
+      <span class="productCat">${item.categoria}</span>
+      <h3>${item.nome}</h3>
+    </article>`)
+    .join("") || `<p class="promoEmpty">Nenhum produto nessa categoria no momento.</p>`;
+}
+
+async function loadProducts() {
+  if (typeof SUPABASE_URL !== "undefined" && SUPABASE_URL && SUPABASE_ANON_KEY) {
+    try {
+      const response = await fetch(
+        `${SUPABASE_URL}/rest/v1/produtos?select=nome,categoria,foto_url&ativo=eq.true&order=categoria.asc,nome.asc`,
+        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        if (Array.isArray(data) && data.length) produtosAtuais = data;
+      }
+    } catch (error) {
+      /* mantém o catálogo de reserva (products.js) se a busca falhar */
+    }
+  }
+  renderProductFilters();
+  renderProducts();
+}
+
+if (productFiltersEl) {
+  renderProductFilters();
+  renderProducts();
+  loadProducts();
+  productFiltersEl.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-cat]");
+    if (!button) return;
+    activeCategory = button.dataset.cat;
+    renderProductFilters();
+    renderProducts();
+  });
+}
+
+/* ---------- Promoções ---------- */
+const promoListEl = document.querySelector("#promo-list");
+
+function renderPromotions(promos) {
+  if (!promoListEl) return;
+  if (!promos || promos.length === 0) {
+    promoListEl.innerHTML = `<p class="promoEmpty">Sem promoções ativas no momento. Fale com a gente para saber as condições atuais.</p>`;
+    return;
+  }
+  promoListEl.innerHTML = promos
+    .map((promo) => `<article class="promoCard">
+      <p class="eyebrow dark">${promo.titulo || ""}</p>
+      <p>${promo.descricao || ""}</p>
+    </article>`)
+    .join("");
+}
+
+async function loadPromotions() {
+  if (!promoListEl) return;
+  if (typeof SUPABASE_URL === "undefined" || !SUPABASE_URL || !SUPABASE_ANON_KEY) return;
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/promocoes?select=titulo,descricao&ativa=eq.true&order=criado_em.desc`,
+      { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    if (!response.ok) return;
+    const data = await response.json();
+    renderPromotions(data);
+  } catch (error) {
+    /* mantém a mensagem padrão se a busca falhar */
+  }
+}
+
+loadPromotions();
+
+/* ---------- Feedback ---------- */
+const feedbackForm = document.querySelector("#feedback-form");
+const ratingStars = document.querySelector("#rating-stars");
+const ratingValue = document.querySelector("#rating-value");
+const feedbackStatus = document.querySelector("#feedback-status");
+
+if (ratingStars) {
+  ratingStars.addEventListener("click", (event) => {
+    const button = event.target.closest("button[data-value]");
+    if (!button) return;
+    const value = Number(button.dataset.value);
+    ratingValue.value = value;
+    ratingStars.querySelectorAll("button").forEach((star) => {
+      star.classList.toggle("filled", Number(star.dataset.value) <= value);
+    });
+  });
+}
+
+if (feedbackForm) {
+  feedbackForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const formData = new FormData(feedbackForm);
+    const nome = formData.get("nome")?.toString().trim();
+    const mensagem = formData.get("mensagem")?.toString().trim();
+    const nota = Number(formData.get("nota"));
+
+    if (!nome || !mensagem || !nota) {
+      feedbackStatus.textContent = "Preencha seu nome, uma nota e uma mensagem.";
+      return;
+    }
+
+    if (typeof SUPABASE_URL === "undefined" || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+      feedbackStatus.textContent = "O envio ainda não está configurado. Fale com a gente pelo WhatsApp por enquanto.";
+      return;
+    }
+
+    feedbackStatus.textContent = "Enviando...";
+    try {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/feedbacks`, {
+        method: "POST",
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify({ nome, nota, mensagem, aprovado: false }),
+      });
+
+      if (!response.ok) throw new Error("Falha ao enviar");
+
+      feedbackStatus.textContent = "Obrigado! Sua avaliação foi enviada.";
+      feedbackForm.reset();
+      ratingStars?.querySelectorAll("button").forEach((star) => star.classList.remove("filled"));
+    } catch (error) {
+      feedbackStatus.textContent = "Não foi possível enviar agora. Tente novamente em instantes.";
+    }
+  });
+}

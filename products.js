@@ -1,0 +1,41 @@
+// Catálogo de produtos da LS Colchões — usado só como reserva (fallback)
+// enquanto o banco de dados (Supabase) não está configurado, ou se ele
+// falhar. Depois de configurar o config.js, o site passa a usar os
+// produtos cadastrados pelo painel /admin.html, e esta lista deixa de
+// ser exibida (mas pode continuar aqui sem problema).
+// Cada linha é: { nome: 'Nome do produto', categoria: 'Colchões' | 'Bases' | 'Cabeceiras' | 'Acessórios', preco: 000.00 },
+const produtosFallback = [
+  { nome: 'Fit 33', categoria: 'Colchões', preco: 799.1 },
+  { nome: 'Base Sommier Pop Marron', categoria: 'Bases', preco: 499.0 },
+  { nome: 'Base Sommier Camurca Bege', categoria: 'Bases', preco: 480.0 },
+  { nome: 'Exclusive Gel', categoria: 'Colchões', preco: 3033.8 },
+  { nome: 'Base Sommier Camurca Preto (opção 1)', categoria: 'Bases', preco: 710.0 },
+  { nome: 'New Freedom', categoria: 'Colchões', preco: 2334.2 },
+  { nome: 'Exclusive Sleep', categoria: 'Colchões', preco: 2796.2 },
+  { nome: 'Base Sommier Bau Phys Camuca Cinza', categoria: 'Bases', preco: 1758.0 },
+  { nome: 'Exclusive Foam', categoria: 'Colchões', preco: 2197.8 },
+  { nome: 'Base Sommier Camurca Preto (opção 2)', categoria: 'Bases', preco: 480.0 },
+  { nome: 'Fit Springpocket', categoria: 'Colchões', preco: 1634.6 },
+  { nome: 'Base Sommier Camurca Cinza', categoria: 'Bases', preco: 810.0 },
+  { nome: 'Airtech Springpocket', categoria: 'Colchões', preco: 1271.6 },
+  { nome: 'Base Sommier Pop', categoria: 'Bases', preco: 420.0 },
+  { nome: 'Base Sommier Pop Bege', categoria: 'Bases', preco: 338.0 },
+  { nome: 'Fit 450', categoria: 'Colchões', preco: 974.6 },
+  { nome: 'Base Sommier Bau Phys Camu Bege', categoria: 'Bases', preco: 918.0 },
+  { nome: 'Travesseiro Hi Conforto', categoria: 'Acessórios', preco: 48.65 },
+  { nome: 'Travesseiro Max Malha', categoria: 'Acessórios', preco: 45.35 },
+  { nome: 'Travesseiro Percal 200 Fios', categoria: 'Acessórios', preco: 51.9 },
+  { nome: 'Travesseiro Aman Tec 140 Fios', categoria: 'Acessórios', preco: 140.65 },
+  { nome: 'Protetor Colchao Coml (opção 1)', categoria: 'Acessórios', preco: 94.75 },
+  { nome: 'Protetor Colchao Coml (opção 2)', categoria: 'Acessórios', preco: 120.55 },
+  { nome: 'Travesseiro Casa Dinho', categoria: 'Acessórios', preco: 49.4 },
+  { nome: 'Travesseiro Conforto Anatomico', categoria: 'Acessórios', preco: 129.57 },
+  { nome: 'Cabeceira Murat Facto Bege (opção 1)', categoria: 'Cabeceiras', preco: 528.0 },
+  { nome: 'Cabeceira Piave Veludo Preto (opção 1)', categoria: 'Cabeceiras', preco: 473.0 },
+  { nome: 'Cabeceira Piave Veludo Cinza', categoria: 'Cabeceiras', preco: 657.8 },
+  { nome: 'Cabeceira Murat Facto Cinza', categoria: 'Cabeceiras', preco: 657.8 },
+  { nome: 'Cabeceira Piave Veludo Preto (opção 2)', categoria: 'Cabeceiras', preco: 440.0 },
+  { nome: 'Cabeceira Piave Veludo Bege', categoria: 'Cabeceiras', preco: 440.0 },
+  { nome: 'Cabeceira Murat Facto Bege (opção 2)', categoria: 'Cabeceiras', preco: 440.0 },
+  { nome: 'Cabeceira Piave Veludo Marrom', categoria: 'Cabeceiras', preco: 393.8 },
+  { nome: 'Orthofort D33 Sm', categoria: 'Colchões', preco: 1501.95 },];
