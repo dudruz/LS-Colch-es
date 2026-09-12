@@ -35,6 +35,8 @@
       .editRow{display:grid;gap:8px;margin-top:6px}
       .editRow input{border:1px solid var(--line);padding:9px;font:13px Montserrat,Arial,sans-serif}
       .stars{color:var(--gold);letter-spacing:2px}
+      .promoPrecos s{color:var(--muted);margin-right:6px}
+      .promoPrecos b{color:#8b681b}
       .badge{font-size:9px;padding:3px 8px;border:1px solid var(--gold);color:#8b681b;text-transform:uppercase;letter-spacing:.06em}
       .empty{color:var(--muted);font-size:13px}
       #login{max-width:340px;margin:70px auto;text-align:center}
@@ -88,8 +90,12 @@
           <h2>Nova promoção</h2>
           <label>Título<input type="text" id="promo-titulo" maxlength="80" placeholder="Ex: 20% off em bases"></label>
           <label>Descrição<textarea id="promo-descricao" maxlength="300" placeholder="Detalhes da condição, validade etc."></textarea></label>
+          <label>Foto (opcional)<input type="file" id="promo-foto" accept="image/*"></label>
+          <label>Preço antigo (opcional)<input type="text" id="promo-preco-antigo" inputmode="decimal" placeholder="Ex: 999,90"></label>
+          <label>Preço novo (opcional)<input type="text" id="promo-preco-novo" inputmode="decimal" placeholder="Ex: 799,90"></label>
           <label class="row"><input type="checkbox" id="promo-ativa" checked> Já publicar essa promoção no site</label>
           <button class="primary" id="promo-add">Adicionar promoção</button>
+          <p class="empty" id="promo-add-status"></p>
         </section>
 
         <section>

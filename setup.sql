@@ -116,3 +116,9 @@ select * from (values
   ('Orthofort D33 Sm', 'Colchões', 1501.95, true)
 ) as seed(nome, categoria, preco, ativo)
 where not exists (select 1 from produtos);
+
+-- 5) Foto e preço antigo/novo nas promoções (adicionado depois) --------
+alter table promocoes add column if not exists foto_url text;
+alter table promocoes add column if not exists preco_antigo numeric;
+alter table promocoes add column if not exists preco_novo numeric;
+-- Reaproveita o bucket "produtos-fotos" (já público) para as fotos de promoção.

@@ -67,6 +67,19 @@ updateScrollProgress();
 window.addEventListener("scroll", updateScrollProgress, { passive: true });
 window.addEventListener("resize", updateScrollProgress);
 
+function formatPrice(value) {
+  return Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function bancoConfigurado() {
+  return (
+    typeof SUPABASE_URL !== "undefined" &&
+    /^https:\/\/.+\.supabase\.co$/.test(SUPABASE_URL) &&
+    typeof SUPABASE_ANON_KEY !== "undefined" &&
+    SUPABASE_ANON_KEY
+  );
+}
+
 /* ---------- Produtos ---------- */
 // O preço NÃO é exibido publicamente — fica só no catálogo interno (admin.html),
 // para os consultores consultarem e passarem o valor ao cliente.
@@ -96,7 +109,7 @@ function renderProducts() {
 }
 
 async function loadProducts() {
-  if (typeof SUPABASE_URL !== "undefined" && SUPABASE_URL && SUPABASE_ANON_KEY) {
+  if (bancoConfigurado()) {
     try {
       const response = await fetch(
         `${SUPABASE_URL}/rest/v1/produtos?select=nome,categoria,foto_url&ativo=eq.true&order=categoria.asc,nome.asc`,
@@ -138,18 +151,20 @@ function renderPromotions(promos) {
   }
   promoListEl.innerHTML = promos
     .map((promo) => `<article class="promoCard">
+      ${promo.foto_url ? `<img class="promoPhoto" src="${promo.foto_url}" alt="${promo.titulo || ""}" loading="lazy">` : ""}
       <p class="eyebrow dark">${promo.titulo || ""}</p>
       <p>${promo.descricao || ""}</p>
+      ${promo.preco_novo ? `<p class="promoPrecos">${promo.preco_antigo ? `<s>${formatPrice(promo.preco_antigo)}</s>` : ""} <b>${formatPrice(promo.preco_novo)}</b></p>` : ""}
     </article>`)
     .join("");
 }
 
 async function loadPromotions() {
   if (!promoListEl) return;
-  if (typeof SUPABASE_URL === "undefined" || !SUPABASE_URL || !SUPABASE_ANON_KEY) return;
+  if (!bancoConfigurado()) return;
   try {
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/promocoes?select=titulo,descricao&ativa=eq.true&order=criado_em.desc`,
+      `${SUPABASE_URL}/rest/v1/promocoes?select=titulo,descricao,foto_url,preco_antigo,preco_novo&ativa=eq.true&order=criado_em.desc`,
       { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
     );
     if (!response.ok) return;
@@ -193,7 +208,7 @@ if (feedbackForm) {
       return;
     }
 
-    if (typeof SUPABASE_URL === "undefined" || !SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    if (!bancoConfigurado()) {
       feedbackStatus.textContent = "O envio ainda não está configurado. Fale com a gente pelo WhatsApp por enquanto.";
       return;
     }

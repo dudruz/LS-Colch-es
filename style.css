@@ -52,8 +52,12 @@ footer{padding:40px 22px 92px;background:var(--paper);text-align:center}.footerB
 .promoList{margin-top:36px;display:grid;gap:12px}
 .promoList .promoEmpty{color:#c9d7db}
 .promoCard{border:1px solid rgba(255,255,255,.18);padding:22px;background:rgba(255,255,255,.03)}
+.promoPhoto{width:100%;aspect-ratio:16/10;object-fit:cover;margin:-22px -22px 16px;display:block}
 .promoCard .eyebrow{margin-bottom:10px}
 .promoCard p:not(.eyebrow){font:16px/1.6 Georgia,serif;color:#e7edee;margin:0}
+.promoPrecos{margin-top:12px!important;font-family:Montserrat,Arial,sans-serif}
+.promoPrecos s{color:#9fb0b3;font-size:14px;margin-right:8px}
+.promoPrecos b{color:var(--gold);font-size:22px}
 
 /* ---------- Como chegar ---------- */
 .location{padding:78px 22px;background:var(--paper)}
