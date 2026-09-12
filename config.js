@@ -14,7 +14,7 @@ const SUPABASE_URL = "https://llvmvdosautpzlmeggcr.supabase.co";
 //    - chave antiga "anon public": um texto longo que começa com "eyJ..."
 //    - chave nova "publishable key": começa com "sb_publishable_..."
 //    NÃO é a Project URL, é a chave — não misture os dois campos.
-const SUPABASE_ANON_KEY = "";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxsdm12ZG9zYXV0cHpsbWVnZ2NyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkwNjk0MDMsImV4cCI6MjEwNDY0NTQwM30.0_kEtB0W6_wAeOrWAnJRZDNBD_uHZW0lzPan-OjKQOU";
 
 // Senha para entrar no painel (admin.html) — pode trocar quando quiser.
 // Atenção: isso só afasta curiosos, não é uma segurança forte (veja o README).
