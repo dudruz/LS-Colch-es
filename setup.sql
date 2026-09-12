@@ -58,9 +58,11 @@ create policy "exclusao publica promocoes" on promocoes for delete using (true);
 
 drop policy if exists "leitura publica feedbacks" on feedbacks;
 drop policy if exists "escrita publica feedbacks" on feedbacks;
+drop policy if exists "atualizacao publica feedbacks" on feedbacks;
 drop policy if exists "exclusao publica feedbacks" on feedbacks;
 create policy "leitura publica feedbacks" on feedbacks for select using (true);
 create policy "escrita publica feedbacks" on feedbacks for insert with check (true);
+create policy "atualizacao publica feedbacks" on feedbacks for update using (true);
 create policy "exclusao publica feedbacks" on feedbacks for delete using (true);
 
 -- 3) Bucket de fotos dos produtos ---------------------------------------

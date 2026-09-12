@@ -71,6 +71,16 @@ Sobre as fotos: o preço nunca aparece no site público — só nome,
 categoria e foto (quando tiver). O preço fica só no /admin.html, só
 para os consultores consultarem.
 
+Sobre as avaliações: quando um cliente envia pelo site, ela fica
+"Pendente" no painel — só depois que você clicar em "Aprovar e
+publicar" em /admin.html ela passa a aparecer na seção "O que dizem
+sobre a LS" do site. Dá para remover do site (sem excluir) a
+qualquer momento clicando em "Remover do site".
+
+Se você já tinha rodado o setup.sql antes desta atualização, rode o
+arquivo inteiro de novo — ele é seguro de repetir (não duplica nada)
+e vai só adicionar a permissão que faltava para aprovar avaliações.
+
 Enquanto o Supabase não estiver configurado, a aba Produtos do site
 mostra o catálogo de reserva (o arquivo products.js, sem fotos), e as
 seções de Promoções e Feedback ficam com uma mensagem padrão avisando

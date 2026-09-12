@@ -479,8 +479,10 @@ ready(() => {
         (f) => `<div class="item" data-id="${f.id}">
           <div class="top">
             <div><b>${f.nome || ""}</b><div class="stars">${"★".repeat(f.nota || 0)}${"☆".repeat(5 - (f.nota || 0))}</div><div>${f.mensagem || ""}</div></div>
+            <span class="badge">${f.aprovado ? "Aprovado" : "Pendente"}</span>
           </div>
           <div class="actions">
+            <button class="ghost" data-action="toggle-feedback" data-id="${f.id}" data-aprovado="${f.aprovado}">${f.aprovado ? "Remover do site" : "Aprovar e publicar"}</button>
             <button class="danger" data-action="delete-feedback" data-id="${f.id}">Excluir</button>
           </div>
         </div>`
@@ -489,13 +491,27 @@ ready(() => {
   }
 
   feedbackListEl.addEventListener("click", async (event) => {
-    const button = event.target.closest("button[data-action='delete-feedback']");
+    const button = event.target.closest("button[data-action]");
     if (!button) return;
-    if (!confirm("Excluir esta avaliação?")) return;
-    await fetch(`${SUPABASE_URL}/rest/v1/feedbacks?id=eq.${button.dataset.id}`, {
-      method: "DELETE",
-      headers: headers(),
-    });
-    loadFeedbacks();
+    const { action, id } = button.dataset;
+
+    if (action === "toggle-feedback") {
+      const current = button.dataset.aprovado === "true";
+      await fetch(`${SUPABASE_URL}/rest/v1/feedbacks?id=eq.${id}`, {
+        method: "PATCH",
+        headers: headers({ Prefer: "return=minimal" }),
+        body: JSON.stringify({ aprovado: !current }),
+      });
+      loadFeedbacks();
+    }
+
+    if (action === "delete-feedback") {
+      if (!confirm("Excluir esta avaliação?")) return;
+      await fetch(`${SUPABASE_URL}/rest/v1/feedbacks?id=eq.${id}`, {
+        method: "DELETE",
+        headers: headers(),
+      });
+      loadFeedbacks();
+    }
   });
 });

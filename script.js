@@ -177,6 +177,43 @@ async function loadPromotions() {
 
 loadPromotions();
 
+/* ---------- Depoimentos (feedbacks aprovados) ---------- */
+const testimonialListEl = document.querySelector("#testimonial-list");
+
+function renderTestimonials(items) {
+  if (!testimonialListEl) return;
+  if (!items || items.length === 0) {
+    testimonialListEl.innerHTML = `<p class="testimonialEmpty">Em breve, depoimentos de quem já comprou com a gente.</p>`;
+    return;
+  }
+  testimonialListEl.innerHTML = items
+    .map(
+      (f) => `<article class="testimonialCard">
+        <span class="stars">${"★".repeat(f.nota || 0)}${"☆".repeat(5 - (f.nota || 0))}</span>
+        <p>${f.mensagem || ""}</p>
+        <b>${f.nome || ""}</b>
+      </article>`
+    )
+    .join("");
+}
+
+async function loadTestimonials() {
+  if (!testimonialListEl || !bancoConfigurado()) return;
+  try {
+    const response = await fetch(
+      `${SUPABASE_URL}/rest/v1/feedbacks?select=nome,nota,mensagem&aprovado=eq.true&order=criado_em.desc&limit=9`,
+      { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+    );
+    if (!response.ok) return;
+    const data = await response.json();
+    renderTestimonials(data);
+  } catch (error) {
+    /* mantém a mensagem padrão se a busca falhar */
+  }
+}
+
+loadTestimonials();
+
 /* ---------- Feedback ---------- */
 const feedbackForm = document.querySelector("#feedback-form");
 const ratingStars = document.querySelector("#rating-stars");
@@ -228,7 +265,7 @@ if (feedbackForm) {
 
       if (!response.ok) throw new Error("Falha ao enviar");
 
-      feedbackStatus.textContent = "Obrigado! Sua avaliação foi enviada.";
+      feedbackStatus.textContent = "Obrigado! Sua avaliação foi enviada e vai aparecer no site após ser revisada pela loja.";
       feedbackForm.reset();
       ratingStars?.querySelectorAll("button").forEach((star) => star.classList.remove("filled"));
     } catch (error) {
