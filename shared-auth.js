@@ -133,7 +133,7 @@
       showApp();
       if(!document.querySelector('script[data-dashboard-app]')){
         const s=document.createElement('script');
-        s.src='app.js?v=11';
+        s.src='app.js?v=12';
         s.dataset.dashboardApp='1';
         document.body.appendChild(s);
       }

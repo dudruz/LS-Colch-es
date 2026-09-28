@@ -12,3 +12,5 @@
 .top-actions .ghost{margin-left:8px}
 
 .app-shell{display:contents}
+
+.sale-tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid #e4e9ed}.sale-tab{border:0;background:transparent;padding:10px 13px;border-radius:8px 8px 0 0;color:#7b8794;font-weight:700;cursor:pointer}.sale-tab.active{background:#edf5fb;color:#126ca5}.sale-tab-panel{display:none}.sale-tab-panel.active{display:block}.item-main{display:flex;flex-direction:column;gap:4px;min-width:0}.item-main select{width:100%}.item-description{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:2px}.gift-free{display:grid;place-items:center;background:#fff4d6;color:#8b681b;border-radius:8px;font-size:9px;font-weight:800;letter-spacing:.5px}.gift-row{grid-template-columns:minmax(220px,1.8fr) 90px 100px 36px}.gift-row .gift-qty{width:100%}
