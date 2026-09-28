@@ -75,7 +75,48 @@
 
   function migrateSales(rows) {
     if (!Array.isArray(rows)) return [];
-    // V2 stored one row per item. Group rows with the same sale id/client/date/seller into one order.
+
+    // V5+ stores real orders with an `items` array. Preserve them exactly;
+    // only normalize their fields. The old migration below is used only for
+    // genuinely legacy rows that have no `items` array.
+    const modern = rows.some(r => Array.isArray(r?.items));
+    if (modern) {
+      return rows.map((r, idx) => {
+        const items = Array.isArray(r.items) ? r.items.map(i => ({
+          product: clean(i?.product || ''),
+          qty: Number(i?.qty) || 0,
+          unit: Number(i?.unit) || 0,
+          description: clean(i?.description || '')
+        })) : [];
+        const gifts = Array.isArray(r.gifts) ? r.gifts.map(i => ({
+          product: clean(i?.product || ''),
+          qty: Number(i?.qty) || 0,
+          unit: Number(i?.unit) || 0,
+          description: clean(i?.description || '')
+        })) : [];
+        const payment = Array.isArray(r.payment) ? r.payment.map(normalizePayment) : [];
+        const calculatedTotal = items.reduce((sum, i) => sum + i.qty * i.unit, 0);
+        const received = Number(r.received) || payment.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
+        return {
+          ...r,
+          id: Number(r.id) || idx + 1,
+          date: r.date || new Date().toISOString().slice(0,10),
+          seller: clean(r.seller),
+          client: clean(r.client),
+          customerId: r.customerId || '',
+          customer: r.customer || {},
+          items,
+          gifts,
+          payment,
+          received,
+          notes: clean(r.notes || ''),
+          attachment: r.attachment || null,
+          total: Number(r.total) || calculatedTotal
+        };
+      });
+    }
+
+    // Legacy V2/V3 rows: one row per item. Group them into orders.
     const map = new Map();
     rows.forEach((r, idx) => {
       const id = Number(r.id) || idx + 1;
@@ -94,8 +135,6 @@
       o.received += Number(r.received) || 0;
     });
     return [...map.values()].map(o => {
-      // If legacy rows repeated the same payment in each item, payment values are still intentionally summed;
-      // imported source data has per-item received values, which is what we want for the historical total.
       o.total = o.items.reduce((a, x) => a + x.qty * x.unit, 0);
       if (!o.received) o.received = o.payment.reduce((a,p)=>a+p.amount,0);
       return o;
