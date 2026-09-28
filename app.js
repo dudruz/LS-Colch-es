@@ -140,14 +140,18 @@
   }
   function baseProductName(name){ return norm(name).replace(/\s*(?:[-–—]\s*R\$?\s*[\d.,]+|(?:\d{2,4}[x×]\d{2,4}[x×]\d{2,4})|\d{2,3}x\d{2,3}x\d{1,3})\s*$/i,'').trim(); }
   function productByName(name) {
-    const exact=state.products.find(p => norm(p.name) === norm(name)); if(exact) return exact;
-    const d=dimensionsFromName(name), base=baseProductName(name);
+    const raw = clean(name);
+    if (!raw) return undefined;
+    const exact=state.products.find(p => norm(p.name) === norm(raw)); if(exact) return exact;
+    const d=dimensionsFromName(raw), base=baseProductName(raw);
     const candidates=state.products.filter(p=>{const pn=baseProductName(p.name);return pn===base || base.includes(pn) || pn.includes(base);});
     if(d){ const same=candidates.find(p=>norm(p.size)===d.size && Number(p.height||0)===Number(d.height)); if(same)return same; const bySize=candidates.find(p=>norm(p.size)===d.size); if(bySize)return bySize; }
-    return candidates[0];
+    return candidates.length === 1 ? candidates[0] : undefined;
   }
-  function reportName(name) { const p = productByName(name); return p?.reportName || p?.name || clean(name); }
-  function canonicalProduct(name) { return productByName(name)?.name || clean(name); }
+  // O nome salvo na venda é a fonte de verdade. Se o produto não casar com o
+  // cadastro atual, preservamos o texto original em vez de cair no primeiro produto.
+  function reportName(name) { const raw=clean(name); return raw || 'Produto não informado'; }
+  function canonicalProduct(name) { const raw=clean(name); if(!raw) return ''; return productByName(raw)?.name || raw; }
   function saleTotal(s) { return Number(s.total ?? (s.items || []).reduce((a,i)=>a+Number(i.qty||0)*Number(i.unit||0),0)) || 0; }
   function saleReceived(s) { return Number(s.received ?? (s.payment||[]).reduce((a,p)=>a+Number(p.amount||0),0)) || 0; }
   function itemQty(s) { return (s.items || []).reduce((a,i)=>a+Number(i.qty||0),0); }
@@ -219,7 +223,10 @@
   function addSaleItem(item={product:state.products[0]?.name||'',qty:1,unit:null}){
     const d=document.createElement('div');d.className='sale-item-row';
     const price=item.unit ?? (()=>{const p=productByName(item.product);return p?(p.cost*(1+p.margin)).toFixed(2):''})();
-    d.innerHTML=`<select class="item-product">${state.products.map(p=>`<option value="${escapeHtml(p.name)}" ${p.name===item.product?'selected':''}>${escapeHtml(p.name)}${p.size?' — '+escapeHtml(p.size):''}${p.height?' — '+escapeHtml(p.height)+' cm':''}</option>`).join('')}</select><input class="item-qty" type="number" min="1" step="1" value="${item.qty||1}"><input class="item-unit" type="number" min="0" step="0.01" value="${price}"><button type="button" title="Remover item">×</button>`;
+    const savedProduct=clean(item.product);
+    const hasExact=state.products.some(p=>norm(p.name)===norm(savedProduct));
+    const legacyOption=savedProduct && !hasExact ? `<option value="${escapeHtml(savedProduct)}" selected>${escapeHtml(savedProduct)}</option>` : '';
+    d.innerHTML=`<select class="item-product">${legacyOption}${state.products.map(p=>`<option value="${escapeHtml(p.name)}" ${p.name===savedProduct?'selected':''}>${escapeHtml(p.name)}${p.size?' — '+escapeHtml(p.size):''}${p.height?' — '+escapeHtml(p.height)+' cm':''}</option>`).join('')}</select><input class="item-qty" type="number" min="1" step="1" value="${item.qty||1}"><input class="item-unit" type="number" min="0" step="0.01" value="${price}"><button type="button" title="Remover item">×</button>`;
     d.querySelector('.item-product').onchange=e=>{const p=productByName(e.target.value);d.querySelector('.item-unit').value=p?(p.cost*(1+p.margin)).toFixed(2):'';updateSaleTotal();};
     d.querySelectorAll('input').forEach(x=>x.oninput=updateSaleTotal);d.querySelector('button').onclick=()=>{d.remove();updateSaleTotal();};$('#saleItems').appendChild(d);updateSaleTotal();
   }
