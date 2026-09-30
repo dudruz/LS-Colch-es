@@ -58,7 +58,10 @@
       category: canonicalCategory(p.category || p.originalCategory || ''), description: p.description || '',
       initial: Number(p.initial ?? p.stock ?? 0) || 0,
       min: Number(p.min ?? 0) || 0, cost: Number(p.cost ?? 0) || 0,
-      margin: Number(p.margin ?? 0) || 0, promo: p.promo || '',
+      salePrice: Number(p.salePrice ?? p.price ?? 0) || 0,
+      promoPrice: Number(p.promoPrice ?? 0) || 0,
+      promoGift: clean(p.promoGift || ''),
+      margin: 0, promo: p.promo || '',
       originalCategory: p.originalCategory || p.category || ''
     };
   }
@@ -218,7 +221,7 @@
   }
 
   function renderStock(){const f=$('#stockFilter').value,a=state.products.map(productState).filter(p=>!f||(f==='critical'?p.current<p.min:p.current>=p.min));$('#stockTable').innerHTML=a.map(p=>`<tr><td>${p.name}</td><td>${p.category}</td><td><input class="stock-input" data-id="${p.id}" type="number" min="0" step="1" value="${p.current}"></td><td>${p.min}</td><td>${fmt(p.cost)}</td><td><span class="status ${p.current<p.min?'bad':'ok'}">${p.current<p.min?'REPOR':'OK'}</span></td><td><button class="table-btn" data-min="${p.id}">Definir mínimo</button></td></tr>`).join('');const ps=state.products.map(productState),c=ps.filter(p=>p.current<p.min).length;$('#stockKpis').innerHTML=[['Produtos',ps.length,''],['Abaixo do mínimo',c,''],['Custo em estoque',fmt(ps.reduce((a,p)=>a+Math.max(0,p.current)*p.cost,0)),''],['Valor potencial',fmt(ps.reduce((a,p)=>a+Math.max(0,p.current)*p.price,0)),'']].map(x=>`<div class="card"><div class="label">${x[0]}</div><div class="value">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join('');}
-  function renderProducts(){const q=norm($('#productSearch').value),cat=$('#categoryFilter').value,a=state.products.filter(p=>(!q||[p.name,p.reportName,p.description].some(x=>norm(x).includes(q)))&&(!cat||p.category===cat));$('#productsTable').innerHTML=a.map(p=>`<tr><td><b>${p.name}</b><br><small>Relatório: ${p.reportName}</small></td><td>${p.size||'—'}</td><td>${p.type||'—'}</td><td>${p.height?p.height+' cm':'—'}</td><td>${p.category}</td><td>${fmt(p.cost)}</td><td>${productState(p).current}</td><td><button class="table-btn edit-product" data-id="${p.id}">Editar</button></td></tr>`).join('');}
+  function renderProducts(){const q=norm($('#productSearch').value),cat=$('#categoryFilter').value,a=state.products.filter(p=>(!q||[p.name,p.reportName,p.description,p.promoGift].some(x=>norm(x).includes(q)))&&(!cat||p.category===cat));$('#productsTable').innerHTML=a.map(p=>`<tr><td><b>${p.name}</b><br><small>Relatório: ${p.reportName}</small></td><td>${p.size||'—'}</td><td>${p.type||'—'}</td><td>${p.height?p.height+' cm':'—'}</td><td>${p.category}</td><td>${fmt(p.cost)}</td><td>${fmt(p.salePrice)}</td><td>${p.promoPrice?fmt(p.promoPrice):'—'}</td><td>${productState(p).current}</td><td><button class="table-btn edit-product" data-id="${p.id}">Editar</button> <button class="table-btn danger delete-product" data-id="${p.id}">Excluir</button></td></tr>`).join('');}
   function renderReports(){
     const ss=salesPeriod(),rev=ss.reduce((a,s)=>a+saleReceived(s),0),orders=ss.length,qty=ss.reduce((a,s)=>a+itemQty(s),0),avg=orders?rev/orders:0;
     $('#reportText').innerHTML=`<h2>Resumo comercial</h2><p>No período selecionado: <span class="metric">${fmt(rev)}</span> recebidos, <span class="metric">${orders}</span> venda(s), <span class="metric">${qty}</span> item(ns) e ticket médio de <span class="metric">${fmt(avg)}</span>.</p>`;
@@ -263,14 +266,14 @@
   }
   function addSaleItem(item={product:state.products[0]?.name||'',qty:1,unit:null,description:''}){
     const d=document.createElement('div');d.className='sale-item-row';
-    const price=item.unit ?? (()=>{const p=productByName(item.product);return p?(p.cost*(1+p.margin)).toFixed(2):''})();
+    const price=item.unit ?? (()=>{const p=productByName(item.product);return p?((p.promoPrice>0?p.promoPrice:p.salePrice)||0).toFixed(2):''})();
     const savedProduct=clean(item.product);
     const hasExact=state.products.some(p=>norm(p.name)===norm(savedProduct));
     const legacyOption=savedProduct && !hasExact ? `<option value="${escapeHtml(savedProduct)}" selected>${escapeHtml(savedProduct)}</option>` : '';
     d.innerHTML=`<div class="item-main"><select class="item-product">${legacyOption}${state.products.map(p=>`<option value="${escapeHtml(p.name)}" ${p.name===savedProduct?'selected':''}>${escapeHtml(p.name)}${p.size?' — '+escapeHtml(p.size):''}${p.height?' — '+escapeHtml(p.height)+' cm':''}</option>`).join('')}</select><small class="item-description"></small></div><input class="item-qty" type="number" min="1" step="1" value="${item.qty||1}"><input class="item-unit" type="number" min="0" step="0.01" value="${price}"><button type="button" title="Remover item">×</button>`;
     const desc=d.querySelector('.item-description');
     const updateDesc=()=>{desc.textContent=clean(item.description)||itemDescription(d.querySelector('.item-product').value);};
-    d.querySelector('.item-product').onchange=e=>{const p=productByName(e.target.value);d.querySelector('.item-unit').value=p?(p.cost*(1+p.margin)).toFixed(2):'';item.description='';updateDesc();updateSaleTotal();};
+    d.querySelector('.item-product').onchange=e=>{const p=productByName(e.target.value);d.querySelector('.item-unit').value=p?((p.promoPrice>0?p.promoPrice:p.salePrice)||0).toFixed(2):'';item.description='';updateDesc();updateSaleTotal();};
     d.querySelectorAll('input').forEach(x=>x.oninput=updateSaleTotal);d.querySelector('button').onclick=()=>{d.remove();updateSaleTotal();};$('#saleItems').appendChild(d);updateDesc();updateSaleTotal();
   }
   function addGiftItem(item={product:state.products[0]?.name||'',qty:1,description:''}){
@@ -319,7 +322,7 @@
   }
 
   function openProduct(p=null){$('#productModalTitle').textContent=p?'Editar produto':'Novo produto';const f=$('#productForm');f.reset();f.elements.id.value=p?.id||'';if(p)Object.keys(p).forEach(k=>{if(f.elements[k])f.elements[k].value=p[k]??''});$('#productModal').classList.add('show');}
-  function saveProduct(e){e.preventDefault();const f=new FormData(e.target);const obj={id:f.get('id')?Number(f.get('id')):Math.max(0,...state.products.map(x=>Number(x.id)||0))+1,name:clean(f.get('name')),reportName:clean(f.get('reportName'))||clean(f.get('name')),type:f.get('type'),size:f.get('size'),height:f.get('height'),category:f.get('category'),description:f.get('description'),initial:Number(f.get('initial')||0),min:Number(f.get('min')||0),cost:Number(f.get('cost')||0),margin:Number(f.get('margin')||0)/100,promo:f.get('promo'),originalCategory:f.get('category')};const i=state.products.findIndex(x=>x.id===obj.id);if(i>=0)state.products[i]=obj;else state.products.push(obj);save();filters();refresh();$('#productModal').classList.remove('show');alert('Produto salvo.');}
+  function saveProduct(e){e.preventDefault();const f=new FormData(e.target);const obj={id:f.get('id')?Number(f.get('id')):Math.max(0,...state.products.map(x=>Number(x.id)||0))+1,name:clean(f.get('name')),reportName:clean(f.get('reportName'))||clean(f.get('name')),type:f.get('type'),size:f.get('size'),height:f.get('height'),category:f.get('category'),description:f.get('description'),initial:Number(f.get('initial')||0),min:Number(f.get('min')||0),cost:Number(f.get('cost')||0),salePrice:Number(f.get('salePrice')||0),promoPrice:Number(f.get('promoPrice')||0),promoGift:clean(f.get('promoGift')),margin:0,promo:f.get('promo'),originalCategory:f.get('category')};const i=state.products.findIndex(x=>x.id===obj.id);if(i>=0)state.products[i]=obj;else state.products.push(obj);save();filters();refresh();$('#productModal').classList.remove('show');alert('Produto salvo.');}
 
   function bind(){
     $$('.nav').forEach(b=>b.onclick=()=>{$$('.nav').forEach(x=>x.classList.remove('active'));b.classList.add('active');$$('.view').forEach(x=>x.classList.remove('active'));$('#'+b.dataset.view).classList.add('active');$('#pageTitle').textContent=b.textContent;refresh();});
@@ -331,7 +334,11 @@
     $('#saleClientSelect').onchange=e=>{if(e.target.value){$('#saleForm').client.value=e.target.value;fillCustomer(e.target.value);}};
     $('#saleForm').client.onblur=e=>fillCustomer(e.target.value);
     $('#newProduct').onclick=()=>openProduct();$('#productForm').onsubmit=saveProduct;
-    $('#productsTable').onclick=e=>{const b=e.target.closest('.edit-product');if(b)openProduct(state.products.find(x=>x.id==b.dataset.id));};
+    $('#productsTable').onclick=e=>{
+      const b=e.target.closest('.edit-product'),d=e.target.closest('.delete-product');
+      if(b)openProduct(state.products.find(x=>x.id==b.dataset.id));
+      if(d){const p=state.products.find(x=>x.id==d.dataset.id);if(p&&confirm(`Excluir o produto "${p.name}"?\n\nO produto será removido do catálogo, mas vendas históricas serão preservadas.`)){state.products=state.products.filter(x=>x.id!==p.id);save();filters();refresh();}}
+    };
     $('#salesTable').onclick=e=>{const edit=e.target.closest('.edit-sale'),del=e.target.closest('.delete-sale');if(edit)openSale(state.sales.find(s=>Number(s.id)===Number(edit.dataset.id)));if(del){const s=state.sales.find(x=>Number(x.id)===Number(del.dataset.id));if(s&&confirm(`Excluir a venda #${s.id} de ${s.client}?\nEssa ação não pode ser desfeita.`)){state.sales=state.sales.filter(x=>Number(x.id)!==Number(s.id));save();filters();refresh();}}};
     $('#salesTable').addEventListener('click',e=>{const b=e.target.closest('[data-sale-file]');if(b){const s=state.sales.find(x=>Number(x.id)===Number(b.dataset.saleFile));if(s?.attachment)downloadFile(s.attachment);}});
     $('#stockTable').addEventListener('change',e=>{if(e.target.classList.contains('stock-input')){const id=Number(e.target.dataset.id),p=state.products.find(x=>x.id===id);if(p){const sold=soldMap()[p.name]||0;p.initial=Number(e.target.value)+sold;save();refresh();}}});
