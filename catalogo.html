@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colchões e conjuntos box · LS Colchões · Lagoa Santa</title>
+<meta name="description" content="Colchões de molas ensacadas, espuma e híbridos, conjuntos box e box baú. Filtre por tamanho, firmeza e preço. Revenda autorizada Ortobom em Lagoa Santa/MG.">
+<meta name="theme-color" content="#062A4F">
+<link rel="icon" href="assets/img/ls-simbolo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/site.css">
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header id="topo"></header>
+
+<main id="conteudo">
+  <section class="cabeca-pag">
+    <div class="ondas claras" aria-hidden="true"></div>
+    <div class="wrap" style="position:relative">
+      <nav class="trilha" aria-label="Você está em"><a href="index.html">Início</a><span aria-hidden="true">/</span><span aria-current="page">Colchões</span></nav>
+      <h1 class="entra"><span>Colchões e conjuntos</span></h1>
+      <p class="texto">Conforto escolhido com cuidado. Filtre por tamanho, firmeza e tipo. Se ficar em dúvida, um consultor compara os modelos com você.</p>
+      <div class="chips" id="categorias" role="group" aria-label="Categorias" style="margin-top:28px"></div>
+    </div>
+  </section>
+
+  <section class="sec sec-branca" style="padding-top:40px">
+    <div class="wrap catalogo">
+      <aside class="filtros" aria-label="Filtros">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--linha)">
+          <h2 style="margin:0;font-size:13px;letter-spacing:.2em;color:var(--navy)">FILTRAR</h2>
+          <button type="button" id="limpar" style="border:0;background:none;color:var(--ouro-txt);font-weight:600;cursor:pointer;min-height:40px">Limpar</button>
+        </div>
+        <form id="filtros">
+          <fieldset><legend>Tamanho</legend><div id="f-tamanhos"></div></fieldset>
+          <fieldset><legend>Firmeza</legend>
+            <label class="opcao"><input type="checkbox" name="firmeza" value="1,2"> Macia</label>
+            <label class="opcao"><input type="checkbox" name="firmeza" value="3"> Média</label>
+            <label class="opcao"><input type="checkbox" name="firmeza" value="4,5"> Firme</label>
+          </fieldset>
+          <fieldset><legend>Tipo</legend>
+            <label class="opcao"><input type="checkbox" name="tipo" value="Molas ensacadas"> Molas ensacadas</label>
+            <label class="opcao"><input type="checkbox" name="tipo" value="Molas bonnel"> Molas bonnel</label>
+            <label class="opcao"><input type="checkbox" name="tipo" value="Espuma"> Espuma</label>
+            <label class="opcao"><input type="checkbox" name="tipo" value="Híbrido"> Híbrido</label>
+          </fieldset>
+          <fieldset><legend>Faixa de preço</legend>
+            <label class="opcao"><input type="radio" name="preco" value="" checked> Todas</label>
+            <label class="opcao"><input type="radio" name="preco" value="0-1500"> Até R$ 1.500</label>
+            <label class="opcao"><input type="radio" name="preco" value="1500-3000"> R$ 1.500 a R$ 3.000</label>
+            <label class="opcao"><input type="radio" name="preco" value="3000-"> Acima de R$ 3.000</label>
+          </fieldset>
+        </form>
+        <div class="cartao-navy" style="margin-top:20px;padding:28px 24px">
+          <h3 style="font-size:26px;margin:0">Na dúvida entre dois modelos?</h3>
+          <p style="position:relative;margin:10px 0 0;font-size:14px">Um consultor compara os dois com você, sem pressa.</p>
+          <a class="btn btn-ouro" style="position:relative;margin-top:18px;min-height:48px" data-zap-msg="Olá! Estou no catálogo do site e quero ajuda para comparar modelos." target="_blank" rel="noopener"><span data-ic="zap"></span> Falar com consultor</a>
+        </div>
+      </aside>
+
+      <div class="lista-prod">
+        <div class="barra-lista">
+          <strong id="contador" style="color:var(--navy)" aria-live="polite">Carregando…</strong>
+          <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--mut)">Ordenar por
+            <select id="ordem">
+              <option value="mais_escolhidos">Mais escolhidos</option>
+              <option value="menor_preco">Menor preço</option>
+              <option value="maior_preco">Maior preço</option>
+              <option value="mais_firmes">Mais firmes</option>
+              <option value="mais_macios">Mais macios</option>
+              <option value="novidades">Novidades</option>
+            </select>
+          </label>
+        </div>
+        <div class="grade-cards" id="produtos" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))"></div>
+        <div style="margin-top:44px;text-align:center"><button class="btn btn-contorno" id="mais" type="button" hidden>Carregar mais modelos</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="wrap">
+      <div class="hd-sec rv">
+        <div><p class="eyebrow">Guia de medidas</p><h2 class="titulo">Qual tamanho cabe no seu quarto?</h2></div>
+        <p class="texto" style="max-width:420px;margin:0">Meça a cama ou o estrado que você já tem e compare. Medidas em centímetros (largura × comprimento).</p>
+      </div>
+      <div class="medidas" id="medidas"></div>
+    </div>
+  </section>
+</main>
+
+<footer id="rodape"></footer>
+<script type="module" src="assets/js/site/catalogo.js"></script>
+</body>
+</html>

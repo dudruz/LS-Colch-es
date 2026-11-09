@@ -1,186 +1,184 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#082d52">
-    <meta name="description" content="LS Colchões em Lagoa Santa: colchões, bases e cabeceiras Ortobom com atendimento próximo para você dormir melhor.">
-    <title>LS Colchões | Conforto que acolhe</title>
-    <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
-    <link rel="icon" href="assets/favicon-192.png" sizes="192x192" type="image/png">
-    <link rel="apple-touch-icon" href="assets/favicon-180.png">
-    <link rel="stylesheet" href="style.css">
-    <script src="config.js" defer></script>
-    <script src="products.js" defer></script>
-    <script src="script.js" defer></script>
-  </head>
-  <body>
-    <main>
-      <div class="progressBar" aria-hidden="true"></div>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LS Colchões · Loja de colchões em Lagoa Santa · Revenda Ortobom</title>
+<meta name="description" content="Colchões, conjuntos box, box baú e travesseiros em Lagoa Santa/MG. Atendimento consultivo, garantia de fábrica Ortobom e showroom para deitar antes de decidir.">
+<meta name="theme-color" content="#062A4F">
+<link rel="icon" href="assets/img/ls-simbolo.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="LS Colchões · Conforto que acolhe. Sono que transforma.">
+<meta property="og:description" content="Loja de colchões em Lagoa Santa/MG. Revenda autorizada Ortobom.">
+<meta property="og:locale" content="pt_BR">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/site.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"FurnitureStore","name":"LS Colchões","image":"assets/img/ls-logo-cor.svg",
+ "address":{"@type":"PostalAddress","streetAddress":"Av. Pref. João Daher, 1277, loja 3","addressLocality":"Lagoa Santa","addressRegion":"MG","addressCountry":"BR"},
+ "sameAs":["https://instagram.com/ls_colchoes"]}
+</script>
+</head>
+<body>
+<a class="pular" href="#conteudo">Pular para o conteúdo</a>
+<header id="topo"></header>
 
-      <header class="topbar">
-        <a class="brand" href="#inicio" aria-label="LS Colchões - início">
-          <img src="assets/ls-logo-transparent.png" alt="LS Colchões" width="470" height="215">
-        </a>
-        <button class="menuButton" type="button" aria-expanded="false" aria-controls="menu-principal" aria-label="Abrir menu">
-          <span></span><span></span>
-        </button>
-        <nav class="nav" id="menu-principal" aria-label="Navegação principal">
-          <a href="#sobre">A LS</a>
-          <a href="#produtos">Produtos</a>
-          <a href="#promocoes">Promoções</a>
-          <a href="#como-chegar">Como chegar</a>
-          <a href="https://www.instagram.com/ls_colchoes/" target="_blank" rel="noopener noreferrer">Instagram ↗</a>
-          <a href="painel.html">Área da equipe</a><a class="navCta" href="#como-chegar">Fale com a gente</a>
-        </nav>
-      </header>
+<main id="conteudo">
+  <!-- Topo em carrossel (banners vêm da Gestão do site) -->
+  <section class="hero" aria-roledescription="carrossel" aria-label="Destaques">
+    <div class="lua" aria-hidden="true"></div>
+    <div class="anel" aria-hidden="true"></div>
+    <div class="ondas" style="bottom:28px" aria-hidden="true"></div>
+    <div class="hero-in">
+      <div id="slides"></div>
+      <div class="hero-ctrl" id="hero-ctrl" hidden>
+        <button class="btn btn-redondo" type="button" data-hero="anterior" aria-label="Destaque anterior"></button>
+        <div class="pontos" id="pontos"></div>
+        <button class="btn btn-redondo" type="button" data-hero="proximo" aria-label="Próximo destaque"></button>
+        <span id="hero-num"></span>
+      </div>
+    </div>
+  </section>
 
-      <section class="hero" id="inicio">
-        <div class="heroPattern" aria-hidden="true"></div>
-        <div class="heroCopy" data-reveal>
-          <div class="heroBrand">
-            <img src="assets/ls-logo-transparent.png" alt="LS Colchões" width="470" height="215">
-          </div>
-          <p class="eyebrow">LOJA ABERTA • LAGOA SANTA</p>
-          <h1>Escolher bem muda<br><em>o jeito que você acorda.</em></h1>
-          <p class="heroText">Conforto de verdade começa quando alguém entende suas noites. A LS está em Lagoa Santa para transformar dúvida em uma escolha segura.</p>
-          <div class="heroActions">
-            <a class="button primary" href="#produtos">Ver catálogo <span>→</span></a>
-            <a class="textLink" href="#como-chegar">Como chegar até a loja <span>↓</span></a>
-          </div>
-          <div class="heroTrust"><span>100% Ortobom</span><i></i><span>Atendimento próximo</span><i></i><span>Em Lagoa Santa</span></div>
-        </div>
-        <div class="heroVisual" data-reveal aria-label="Ilustração de uma cama confortável">
-          <div class="orbitLabel">8h<br><small>que mudam as outras 16h</small></div>
-          <div class="bed">
-            <div class="headboard"></div><div class="pillow left"></div><div class="pillow right"></div>
-            <div class="mattress"><span>conforto que acolhe</span></div><div class="base"></div>
-            <i class="leg l1"></i><i class="leg l2"></i>
-          </div>
-          <div class="heroSeal">LS<br><small>LAGOA SANTA</small></div>
-        </div>
-      </section>
+  <div class="marquee" aria-hidden="true"><div id="palavras"></div></div>
 
-      <section class="intro" id="sobre">
-        <div class="introLead" data-reveal>
-          <p class="eyebrow dark">A LS NASCE DE UMA IDEIA SIMPLES</p>
-          <h2>Você não precisa entender de colchão.<br><em>Precisa ser bem orientado.</em></h2>
-        </div>
-        <div class="introText" data-reveal>
-          <p>Não existe um único colchão perfeito para todo mundo. Existe a combinação certa entre corpo, rotina, posição de dormir e sensação de conforto.</p>
-          <p>Por isso, a experiência LS começa pela conversa — e termina com você mais seguro da escolha.</p>
-          <a href="#produtos">Ver o catálogo <span>→</span></a>
-        </div>
-      </section>
+  <section class="beneficios" aria-label="Por que comprar na LS">
+    <div class="wrap grade-4" id="beneficios"></div>
+  </section>
 
-      <section class="products" id="produtos">
-        <div class="sectionHeading" data-reveal>
-          <div><p class="eyebrow dark">CATÁLOGO LS</p><h2>Nossos colchões,<br>bases e acessórios.</h2></div>
-          <p>Fale com a gente para valores e condições.</p>
-        </div>
-        <div class="productFilters" id="product-filters" data-reveal></div>
-        <div class="productGrid" id="product-grid" data-reveal></div>
-      </section>
+  <section class="sec sec-branca">
+    <div class="wrap">
+      <div class="hd-sec rv">
+        <div><p class="eyebrow">Escolha por onde começar</p><h2 class="titulo">Colchões para cada fase da casa.</h2></div>
+        <a class="link-seta" href="catalogo.html">Ver todo o catálogo <span data-ic="seta"></span></a>
+      </div>
+      <div class="grade-cards" id="categorias"></div>
+      <div class="caixa-tam rv">
+        <h3><span data-ic="medida"></span> Já sabe o tamanho?</h3>
+        <div class="chips" id="tamanhos"></div>
+      </div>
+    </div>
+  </section>
 
-      <section class="promotions" id="promocoes">
-        <div class="sectionHeading" data-reveal>
-          <div><p class="eyebrow dark">FIQUE DE OLHO</p><h2>Promoções<br><em>da semana.</em></h2></div>
-          <p>Atualizadas direto pela loja — volte sempre para conferir novidades.</p>
-        </div>
-        <div class="promoList" id="promo-list" data-reveal>
-          <p class="promoEmpty">Sem promoções ativas no momento. Fale com a gente para saber as condições atuais.</p>
-        </div>
-      </section>
+  <section class="sec sec-areia" id="oferta" hidden></section>
 
-      <section class="experience" id="loja">
-        <div class="experienceArt" data-reveal>
-          <div class="experienceCircle"><span>LS</span><small>uma escolha<br>sem pressa</small></div>
-          <div class="wave waveOne"></div><div class="wave waveTwo"></div>
-        </div>
-        <div class="experienceCopy" data-reveal>
-          <p class="eyebrow dark">A EXPERIÊNCIA DA LOJA</p>
-          <h2>Teste com calma.<br>Entenda a diferença.<br><em>Escolha com confiança.</em></h2>
-          <p>A LS Colchões está chegando a Lagoa Santa com produtos Ortobom e um atendimento que traduz características técnicas para a sua realidade.</p>
-          <ul><li><span>01</span>Conte como você dorme e o que deseja mudar</li><li><span>02</span>Compare diferentes construções e sensações</li><li><span>03</span>Receba uma orientação clara, sem pressão</li></ul>
-        </div>
-      </section>
+  <section class="sec" id="sec-destaques" hidden>
+    <div class="wrap">
+      <div class="hd-sec rv">
+        <div><p class="eyebrow">Os mais escolhidos na loja</p><h2 class="titulo">Conforto escolhido com cuidado.</h2></div>
+        <a class="link-seta" href="catalogo.html">Ver todos os modelos <span data-ic="seta"></span></a>
+      </div>
+      <div class="grade-cards" id="destaques"></div>
+    </div>
+  </section>
 
-      <section class="location" id="como-chegar">
-        <div class="sectionHeading" data-reveal>
-          <div><p class="eyebrow dark">VISITE A LOJA</p><h2>Como chegar<br><em>até a LS.</em></h2></div>
-          <p>Vem experimentar de perto — combinamos os detalhes pelo WhatsApp se preferir.</p>
+  <section class="sec sec-branca" id="escolher">
+    <div class="wrap duas-col">
+      <div class="rv rv-e">
+        <p class="eyebrow">Atendimento consultivo</p>
+        <h2 class="titulo">Seu descanso merece uma escolha segura.</h2>
+        <p class="texto">Cada corpo dorme de um jeito. Antes de indicar um modelo, a gente pergunta como você dorme, se sente dores e se divide a cama com alguém. Simples assim.</p>
+        <ol class="passos">
+          <li><b>01</b><div><h3>Conte como você dorme</h3><p>Posição, peso, dores e rotina: em poucos minutos de conversa a gente entende.</p></div></li>
+          <li><b>02</b><div><h3>Experimente sem pressa</h3><p>Deite nos modelos do showroom ou receba as indicações pelo WhatsApp.</p></div></li>
+          <li><b>03</b><div><h3>Receba em casa</h3><p>A gente combina o melhor dia para entregar e montar.</p></div></li>
+        </ol>
+        <a class="btn btn-navy" style="margin-top:32px" data-zap-msg="Olá! Quero ajuda para escolher um colchão." target="_blank" rel="noopener">Quero ajuda para escolher <span data-ic="seta"></span></a>
+      </div>
+      <div class="cartao-navy rv rv-d">
+        <p class="eyebrow claro">Guia rápido</p>
+        <h3>Qual firmeza combina com você?</h3>
+        <div style="margin-top:24px">
+          <div class="guia-item"><div><strong>Macio</strong><span class="barras" aria-hidden="true"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></div><p>Costuma agradar quem dorme de lado e gosta da sensação de afundar um pouco.</p></div>
+          <div class="guia-item"><div><strong>Médio</strong><span class="barras" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></div><p>O mais versátil: bom para casais e para quem muda de posição durante a noite.</p></div>
+          <div class="guia-item"><div><strong>Firme</strong><span class="barras" aria-hidden="true"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></div><p>Indicado para quem dorme de barriga para cima ou de bruços e busca mais suporte.</p></div>
         </div>
-        <div class="locationGrid" data-reveal>
-          <div class="locationInfo">
-            <div><span>ENDEREÇO</span><p>Rua Exemplo, 123 — Centro, Lagoa Santa, MG<br><small>(atualize com o endereço definitivo da loja)</small></p></div>
-            <div><span>HORÁRIO</span><p>Segunda a sexta: 9h às 18h<br>Sábado: 9h às 13h<br><small>(confirme os horários reais)</small></p></div>
-            <div class="locationActions">
-              <a class="button primary" href="https://wa.me/5531971801487" target="_blank" rel="noopener noreferrer">Chamar no WhatsApp <span>→</span></a>
-              <a class="textLink" href="https://www.google.com/maps/search/?api=1&query=LS+Colch%C3%B5es+Lagoa+Santa+MG" target="_blank" rel="noopener noreferrer">Abrir no Google Maps <span>↗</span></a>
-              <a class="textLink" href="https://www.instagram.com/ls_colchoes/" target="_blank" rel="noopener noreferrer">Ver no Instagram <span>↗</span></a>
-            </div>
-          </div>
-          <div class="locationMap">
-            <iframe title="Mapa até a LS Colchões" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=LS+Colch%C3%B5es+Lagoa+Santa+MG&output=embed"></iframe>
-          </div>
-        </div>
-      </section>
+        <p class="serif" style="position:relative;margin:18px 0 0;font-style:italic;font-size:19px;color:#E8D6A8">É só um ponto de partida. A escolha final é sempre com você deitado no colchão.</p>
+      </div>
+    </div>
+  </section>
 
-      <section class="faqSection">
-        <div class="faqTitle" data-reveal>
-          <p class="eyebrow dark">DÚVIDAS RÁPIDAS</p>
-          <h2>Antes de vir<br>até a loja.</h2>
-          <p>Toque em uma pergunta para abrir a resposta.</p>
+  <section class="sec">
+    <div class="wrap duas-col" style="align-items:stretch">
+      <div class="mosaico rv rv-e">
+        <div data-foto="fotos/fachada.jpg" data-alt="Fachada da LS Colchões" data-falta="Foto: fachada da loja"></div>
+        <div data-foto="fotos/showroom.jpg" data-alt="Showroom com camas montadas" data-falta="Foto: showroom"></div>
+        <div data-foto="fotos/tecido.jpg" data-alt="Detalhe do tecido de um colchão" data-falta="Foto: detalhe do tecido"></div>
+      </div>
+      <div class="cartao-navy cartao-visita rv rv-d">
+        <div class="ondas" aria-hidden="true"></div>
+        <p class="eyebrow claro">Visite o showroom</p>
+        <h3 style="font-size:clamp(34px,3.6vw,50px)">Venha deitar antes de decidir.</h3>
+        <p style="position:relative;margin:16px 0 0;font-size:16px;line-height:1.7">Na loja você sente a diferença entre os modelos, com um consultor ao lado para tirar todas as dúvidas. Sem pressa e sem pressão.</p>
+        <ul class="info-lista">
+          <li><span data-ic="pin"></span><span data-info="endereco"></span></li>
+          <li><span data-ic="relogio"></span><span data-info="horario"></span></li>
+        </ul>
+        <div style="position:relative;margin-top:30px;display:flex;flex-wrap:wrap;gap:12px">
+          <a class="btn btn-ouro" data-mapa target="_blank" rel="noopener">Como chegar <span data-ic="seta"></span></a>
+          <a class="btn btn-claro" data-zap-msg="Olá! Quero agendar uma visita ao showroom da LS Colchões." target="_blank" rel="noopener">Agendar visita</a>
         </div>
-        <div class="faqList" data-reveal>
-          <article class="open">
-            <button type="button" aria-expanded="true"><span>01</span><b>Colchão mais duro é sempre melhor para a coluna?</b><i>−</i></button>
-            <div><p>Não. O ideal é ter sustentação adequada sem criar pressão excessiva — depende do seu peso, altura e posição de dormir. É por isso que a gente prefere conversar pessoalmente.</p></div>
-          </article>
-          <article>
-            <button type="button" aria-expanded="false"><span>02</span><b>Quanto tempo preciso testar um colchão na loja?</b><i>+</i></button>
-            <div><p>Não tenha pressa: deite na posição em que costuma dormir e compare diferentes sensações com a nossa orientação.</p></div>
-          </article>
-        </div>
-      </section>
+      </div>
+    </div>
+  </section>
 
-      <section class="testimonials" id="depoimentos">
-        <div class="sectionHeading" data-reveal>
-          <div><p class="eyebrow dark">QUEM JÁ COMPROU CONTA</p><h2>O que dizem<br>sobre a LS.</h2></div>
-        </div>
-        <div class="testimonialList" id="testimonial-list" data-reveal></div>
-      </section>
+  <section class="sec sec-branca" id="sec-depo" hidden>
+    <div class="wrap">
+      <div class="centro rv" style="margin-bottom:48px"><p class="eyebrow">Quem dorme melhor, conta</p><h2 class="titulo">O que dizem nossos clientes</h2></div>
+      <div class="grade-cards" id="depoimentos"></div>
+    </div>
+  </section>
 
-      <section class="feedback" id="feedback">
-        <div class="feedbackCopy" data-reveal>
-          <p class="eyebrow">SUA OPINIÃO AJUDA A LS</p>
-          <h2>Como foi sua<br><em>experiência com a gente?</em></h2>
-          <p>Conte como foi comprar ou visitar a loja — sua avaliação nos ajuda a melhorar.</p>
-        </div>
-        <form class="feedbackForm" id="feedback-form" data-reveal novalidate>
-          <label>Seu nome<input type="text" name="nome" required maxlength="80" placeholder="Como podemos te chamar"></label>
-          <label>Sua nota
-            <div class="ratingStars" id="rating-stars" role="radiogroup" aria-label="Nota de 1 a 5">
-              <button type="button" data-value="1" aria-label="1 estrela">★</button>
-              <button type="button" data-value="2" aria-label="2 estrelas">★</button>
-              <button type="button" data-value="3" aria-label="3 estrelas">★</button>
-              <button type="button" data-value="4" aria-label="4 estrelas">★</button>
-              <button type="button" data-value="5" aria-label="5 estrelas">★</button>
-            </div>
-            <input type="hidden" name="nota" id="rating-value" required>
-          </label>
-          <label>Sua mensagem<textarea name="mensagem" required maxlength="500" rows="4" placeholder="Conte como foi sua experiência"></textarea></label>
-          <button class="button primary" type="submit">Enviar avaliação <span>→</span></button>
-          <p class="feedbackStatus" id="feedback-status" role="status" aria-live="polite"></p>
-        </form>
-      </section>
+  <section class="sec sec-navy" id="contato-rapido">
+    <div class="ondas" style="bottom:20px" aria-hidden="true"></div>
+    <div class="wrap duas-col" style="position:relative">
+      <div class="rv rv-e">
+        <p class="eyebrow">Atendimento no seu tempo</p>
+        <h2 class="titulo">Prefere que a gente te chame?</h2>
+        <p class="texto">Deixe seu nome e WhatsApp. Um consultor da LS entra em contato para entender o que você procura.</p>
+      </div>
+      <form class="form-lead rv rv-d" id="form-lead" novalidate>
+        <label class="campo">Nome<input name="nome" autocomplete="name" required maxlength="120" placeholder="Como podemos te chamar?"></label>
+        <label class="campo">WhatsApp<input name="whatsapp" type="tel" autocomplete="tel" required placeholder="(31) 9 0000-0000"></label>
+        <label class="campo">O que você procura?
+          <select name="interesse"><option>Colchão</option><option>Conjunto box</option><option>Box baú</option><option>Travesseiro</option><option>Ainda não sei</option></select>
+        </label>
+        <label class="campo-extra" aria-hidden="true">Não preencha<input name="site" tabindex="-1" autocomplete="off"></label>
+        <div style="display:flex;align-items:flex-end"><button class="btn btn-navy btn-bloco" type="submit" style="min-height:50px">Quero ser atendido</button></div>
+        <p class="msg-erro" role="alert" hidden></p>
+        <p class="aviso">Usamos seus dados só para te atender. Nada de spam.</p>
+      </form>
+    </div>
+  </section>
 
-      <footer>
-        <div class="footerBrand"><img src="assets/ls-logo-transparent.png" alt="LS Colchões" width="470" height="215"><p>Conforto que acolhe.<br>Sono que transforma.</p></div>
-        <div class="footerLinks"><a href="#produtos">Produtos</a><a href="#promocoes">Promoções</a><a href="#como-chegar">Como chegar</a><a href="https://www.instagram.com/ls_colchoes/" target="_blank" rel="noopener noreferrer">Instagram ↗</a></div>
-        <span>© 2026 LS Colchões • Lagoa Santa, MG</span>
-      </footer>
-      <a class="mobileCta" href="https://wa.me/5531971801487" target="_blank" rel="noopener noreferrer">Fale no WhatsApp <span>↗</span></a>
-    </main>
-  </body>
+  <section class="sec">
+    <div class="wrap duas-col" style="align-items:flex-start">
+      <div class="rv" style="flex:1 1 320px">
+        <p class="eyebrow">Dúvidas frequentes</p>
+        <h2 class="titulo">Antes de comprar, entenda.</h2>
+        <p class="texto">Não achou sua dúvida? <a data-zap-msg="Olá! Tenho uma dúvida sobre colchões." target="_blank" rel="noopener" style="font-weight:600">Pergunte no WhatsApp</a>.</p>
+      </div>
+      <div class="faq rv" style="flex:2 1 560px">
+        <details open><summary>Como sei qual tamanho de colchão comprar?</summary><p>Meça a cama ou o estrado que você já tem. As medidas mais comuns são Solteiro (88 × 188 cm), Casal (138 × 188 cm), Queen (158 × 198 cm) e King (193 × 203 cm). Na dúvida, mande uma foto da sua cama no WhatsApp que a gente confere.</p></details>
+        <details><summary>Vocês entregam em quais cidades?</summary><p>Entregamos em Lagoa Santa e região. Chame no WhatsApp com o seu bairro que a gente confirma o prazo e a montagem.</p></details>
+        <details><summary>Quais são as formas de pagamento?</summary><p>Cartão de crédito parcelado, débito, Pix e dinheiro. As condições do momento são passadas pelo consultor.</p></details>
+        <details><summary>Qual é a garantia dos colchões?</summary><p>Os produtos têm garantia de fábrica, que varia conforme o modelo. O prazo de cada um aparece na ficha técnica, e a gente explica tudo na hora da compra.</p></details>
+        <details><summary>Posso experimentar antes de comprar?</summary><p>Pode e deve. No showroom você deita nos modelos com calma, com um consultor ao lado para comparar.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec sec-branca" style="padding:88px 0">
+    <div class="wrap hd-sec rv" style="margin:0">
+      <div><p class="eyebrow">Instagram</p><h2 class="titulo" style="font-size:clamp(30px,3.4vw,46px)">Dicas de sono e novidades da loja</h2></div>
+      <a class="btn btn-contorno" id="link-insta" target="_blank" rel="noopener"><span data-ic="insta"></span> Seguir no Instagram</a>
+    </div>
+  </section>
+</main>
+
+<footer id="rodape"></footer>
+<script type="module" src="assets/js/site/home.js"></script>
+</body>
 </html>

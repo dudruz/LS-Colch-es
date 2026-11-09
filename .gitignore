@@ -1,0 +1,15 @@
+# ambiente local
+.DS_Store
+node_modules/
+.env
+.env.*
+
+# nunca versionar backups com dados de clientes (LGPD)
+backup/
+*.dump
+*.backup
+*.csv
+
+# Supabase CLI
+supabase/.temp/
+supabase/.branches/
