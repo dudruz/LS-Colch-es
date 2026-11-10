@@ -50,8 +50,11 @@ No **SQL Editor**, cole e rode **um arquivo por vez, nesta ordem**:
 2. `supabase/migrations/20261109120100_seguranca.sql`
 3. `supabase/migrations/20261109120200_funcoes.sql`
 4. `supabase/migrations/20261109120300_storage.sql`
-5. `supabase/seed.sql`
-6. `supabase/dados_exemplo.sql` (opcional, só no projeto de teste)
+5. `supabase/migrations/20261110120000_trafego.sql`
+6. `supabase/seed.sql`
+7. `supabase/dados_exemplo.sql` (opcional, só no projeto de teste)
+
+Ou rode só o `supabase/instalar_tudo.sql`, que junta tudo isso (menos os dados de exemplo) num arquivo.
 
 > Se usar a Supabase CLI: `supabase link` e depois `supabase db push`.
 
@@ -120,6 +123,7 @@ npx serve .
 | Área | O que dá para fazer |
 |---|---|
 | **Visão geral** | Faturamento, vendas, ticket, leads e conversão com comparação automática (Hoje, 7 dias, 30 dias, Este mês × mesmo pedaço do mês anterior, Mês passado, Personalizado). Gráfico por dia ou por hora, meta da loja com projeção, funil, origens, mais vendidos, tamanhos, equipe, entregas de hoje, alertas de estoque e últimas vendas. |
+| **Tráfego e campanhas** | Investimento, leads, custo por lead, vendas, custo por venda, receita e retorno de cada campanha (Meta e Google). Cliques no WhatsApp do site por campanha, motivos de perda, bairros que mais compram, leads aguardando 1º contato e clientes que não respondem. Gerador do link do anúncio (UTM). |
 | **Vendas** | Lista com abas por status, busca e filtros. **Nova venda** (botão no topo de qualquer tela): cliente existente ou novo, itens com preço de tabela/campanha e estoque disponível, desconto, pagamento, parcelas e agendamento. Detalhe da venda: pagamento recebido, agendar entrega, cancelar com motivo. |
 | **CRM e leads** | Funil em colunas (arraste o card). Ao soltar em **Vendido**, oferece registrar a venda; em **Perdido**, pede o motivo. Ficha do lead com WhatsApp pronto, responsável, retorno agendado, valor e anotações. Lista de clientes e ficha completa (compras, atendimentos, linha do tempo). Avisa na hora quando chega lead do site. |
 | **Entregas e agenda** | Semana e rota do dia. Marcar como concluída **dá baixa no estoque** (desmarcar devolve). Ordem da rota, status, WhatsApp do cliente, mapa e rota completa no Google Maps. |
@@ -128,6 +132,14 @@ npx serve .
 | **Produtos** | Publicar/ocultar no site, destaque da home, editor com preços por tamanho, preço de campanha, SKU, estoque mínimo, fotos (capa e ordem), ficha técnica e camadas. |
 | **Gestão do site** | Banners do topo (foto ou vídeo, botão, período de exibição, ordem), campanha com faixa e contagem regressiva, depoimentos e dados da loja (WhatsApp, endereço, horários, distribuição dos leads). |
 | **Equipe e acessos** | Ativar/bloquear contas, papel e % de comissão individual. |
+
+## Como o tráfego pago é medido
+
+1. Todo anúncio leva para o site com o código da campanha no link (`utm_campaign`). O painel gera esse link em **Tráfego e campanhas → Link para anúncio**.
+2. O site guarda o código durante a visita. O formulário de contato grava o lead já com a campanha, e cada clique no WhatsApp conta para ela.
+3. A mensagem do WhatsApp termina com `(ref: código)`. Quem atende cadastra o lead no CRM escolhendo essa campanha.
+4. Campanha nova aparece sozinha no primeiro lead ou clique. Depois é só dar um nome e lançar o investimento do mês.
+5. Lead perdido sempre tem motivo: preço, prazo, não respondeu, comprou em outro lugar ou desconhecido.
 
 ## O que o banco faz sozinho
 

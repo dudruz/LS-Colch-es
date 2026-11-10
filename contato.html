@@ -37,6 +37,7 @@
             <label class="campo">Nome<input name="nome" autocomplete="name" required maxlength="120" placeholder="Como podemos te chamar?"></label>
             <label class="campo">WhatsApp<input name="whatsapp" type="tel" autocomplete="tel" required placeholder="(31) 9 0000-0000"></label>
             <label class="campo">E-mail <small>(opcional)</small><input name="email" type="email" autocomplete="email" placeholder="voce@email.com"></label>
+            <label class="campo">Bairro e cidade <small>(opcional)</small><input name="bairro" autocomplete="address-level3" maxlength="80" placeholder="Ex.: Centro, Lagoa Santa"></label>
             <label class="campo">Tamanho<select name="tamanho" id="sel-tamanho"><option value="">Ainda não sei</option></select></label>
           </div>
           <fieldset style="border:0;margin:0;padding:0">
@@ -127,7 +128,7 @@
         nome: f.get('nome'), whatsapp: f.get('whatsapp'), email: f.get('email'), tamanho: f.get('tamanho'),
         interesses: $$('#interesses [aria-pressed="true"]').map((b) => b.textContent.trim()),
         comoDorme: $('#sono [aria-pressed="true"]')?.textContent.trim() || null,
-        mensagem: f.get('mensagem'), campoExtra: f.get('site'), pagina: 'contato'
+        mensagem: f.get('mensagem'), campoExtra: f.get('site'), pagina: 'contato', bairro: f.get('bairro')
       });
       rastrear('Lead');
       $('#caixa-form').innerHTML = String(h`
