@@ -267,7 +267,7 @@ async function fichaCliente(el, ctx, id, abas) {
     const compras = c.compras.filter((v) => v.status !== 'cancelada');
     el.innerHTML = String(h`
       <div class="hd">${abas}</div>
-      <div class="cabeca"><div><h1>${c.nome}</h1><p>${[c.whatsapp, c.email, [c.logradouro, c.numero].filter(Boolean).join(', '), c.bairro, c.cidade].filter(Boolean).join(' · ') || 'Sem contato cadastrado'}</p></div>
+      <div class="cabeca"><div><h1>${c.nome}</h1><p>${[c.whatsapp, c.email, c.cpf ? 'CPF ' + c.cpf : null, [c.logradouro, c.numero].filter(Boolean).join(', '), c.bairro, c.cidade].filter(Boolean).join(' · ') || 'Sem contato cadastrado'}</p></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">${zap ? h`<a class="btn" href="${zap}" target="_blank" rel="noopener">${icp.zap()} WhatsApp</a>` : ''}
         ${ctx.pode.vender ? h`<button class="btn" data-acao="editar">${icp.editar()} Editar</button><button class="btn btn-g" data-acao="venda">Nova venda</button>` : ''}</div></div>
       <div class="gk">
@@ -302,7 +302,7 @@ async function fichaCliente(el, ctx, id, abas) {
         if (texto) { try { await painel.leads.anotar({ clienteId: c.id, texto }); render(); } catch (err) { toast(err.message, 'erro'); } }
       }
       if (a === 'editar') {
-        const campos = [['nome', 'Nome'], ['whatsapp', 'WhatsApp'], ['email', 'E-mail'], ['cep', 'CEP'], ['logradouro', 'Rua'], ['numero', 'Número'], ['complemento', 'Complemento'], ['bairro', 'Bairro'], ['cidade', 'Cidade']];
+        const campos = [['nome', 'Nome'], ['whatsapp', 'WhatsApp'], ['email', 'E-mail'], ['cpf', 'CPF'], ['cep', 'CEP'], ['logradouro', 'Rua'], ['numero', 'Número'], ['complemento', 'Complemento'], ['bairro', 'Bairro'], ['cidade', 'Cidade']];
         const ok = await modal({
           titulo: 'Editar cliente',
           corpo: h`<div class="g2">${campos.map(([k, t]) => h`<label class="lbl">${t}<input class="inp" name="${k}" value="${c[k] || ''}"></label>`)}
