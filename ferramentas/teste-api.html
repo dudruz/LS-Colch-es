@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Teste da API · LS Colchões</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin: 0; font: 14px/1.5 system-ui, sans-serif; background: #021A33; color: #F4F1E8; }
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px 64px; display: grid; gap: 16px; }
+  h1 { font-size: 22px; margin: 0; }
+  section { background: #062A4F; border-radius: 14px; padding: 16px; display: grid; gap: 10px; }
+  .linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  input, select, button { font: inherit; min-height: 40px; border-radius: 10px; border: 1px solid #2a4a6d; background: #0A3359; color: #F4F1E8; padding: 0 12px; }
+  button { background: #C9A65A; color: #021A33; border: 0; font-weight: 600; cursor: pointer; }
+  pre { margin: 0; background: #021A33; border-radius: 10px; padding: 12px; overflow: auto; max-height: 420px; font-size: 12px; }
+  .erro { color: #F2A07B; }
+  .ok { color: #7FD1AE; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Teste da API · LS Colchões</h1>
+  <p>Página só para conferir se o banco está respondendo. Não aparece no menu do site.</p>
+
+  <section>
+    <strong>Site (sem login)</strong>
+    <div class="linha">
+      <button data-acao="home">Home</button>
+      <button data-acao="catalogo">Catálogo</button>
+      <input id="slug" placeholder="slug do produto" value="colchao-molas-ensacadas-pillow-top">
+      <button data-acao="produto">Produto</button>
+    </div>
+    <div class="linha">
+      <input id="leadNome" placeholder="Nome" value="Teste do site">
+      <input id="leadZap" placeholder="WhatsApp" value="(31) 90000-0000">
+      <button data-acao="lead">Enviar lead</button>
+    </div>
+  </section>
+
+  <section>
+    <strong>Painel (com login)</strong>
+    <div class="linha">
+      <input id="email" type="email" placeholder="e-mail" autocomplete="username">
+      <input id="senha" type="password" placeholder="senha" autocomplete="current-password">
+      <button data-acao="entrar">Entrar</button>
+      <button data-acao="sair">Sair</button>
+      <span id="quem"></span>
+    </div>
+    <div class="linha">
+      <select id="periodo">
+        <option value="hoje">Hoje</option><option value="7d">7 dias</option><option value="30d">30 dias</option>
+        <option value="mes" selected>Este mês</option><option value="mespassado">Mês passado</option>
+      </select>
+      <button data-acao="dashboard">Visão geral</button>
+      <button data-acao="metas">Metas</button>
+      <button data-acao="vendas">Vendas</button>
+      <button data-acao="leads">Leads</button>
+      <button data-acao="estoque">Estoque</button>
+    </div>
+  </section>
+
+  <section>
+    <strong>Resposta <span id="status"></span></strong>
+    <pre id="saida">Clique em um botão.</pre>
+  </section>
+</main>
+<script type="module">
+  import { site, auth, painel } from '../assets/js/api.js';
+  const $ = (id) => document.getElementById(id);
+
+  async function mostrarUsuario() {
+    const p = await auth.perfil().catch(() => null);
+    $('quem').textContent = p ? `${p.nome} · ${p.papel}${p.ativo ? '' : ' (inativo)'}` : 'sem login';
+  }
+
+  const acoes = {
+    home: () => site.home(),
+    catalogo: () => site.catalogo({ ordem: 'menor_preco' }),
+    produto: () => site.produto($('slug').value.trim()),
+    lead: () => site.enviarLead({ nome: $('leadNome').value, whatsapp: $('leadZap').value, interesses: ['Colchão'], pagina: 'teste-api' }),
+    entrar: async () => { const r = await auth.entrar($('email').value, $('senha').value); await mostrarUsuario(); return { usuario: r.user.email }; },
+    sair: async () => { await auth.sair(); await mostrarUsuario(); return 'saiu'; },
+    dashboard: () => painel.dashboard($('periodo').value),
+    metas: () => painel.metas(),
+    vendas: () => painel.vendas.listar({ porPagina: 10 }),
+    leads: () => painel.leads.listar(),
+    estoque: () => painel.estoque.matriz()
+  };
+
+  document.addEventListener('click', async (e) => {
+    const nome = e.target.dataset?.acao;
+    if (!nome) return;
+    $('status').textContent = '…';
+    $('status').className = '';
+    try {
+      const r = await acoes[nome]();
+      $('saida').textContent = JSON.stringify(r, null, 2);
+      $('status').textContent = 'ok';
+      $('status').className = 'ok';
+    } catch (err) {
+      $('saida').textContent = err.message + (err.codigo ? `\n(código ${err.codigo})` : '');
+      $('status').textContent = 'erro';
+      $('status').className = 'erro';
+    }
+  });
+
+  mostrarUsuario();
+</script>
+</body>
+</html>
