@@ -41,7 +41,7 @@ export function horarioTexto() {
   if (hr.sabado) p.push('Sáb, ' + hr.sabado);
   return p.join(' · ') || 'Consulte nosso horário pelo WhatsApp';
 }
-export const ortobom = () => (LOGO_ORTOBOM ? h`<img src="${LOGO_ORTOBOM}" alt="Ortobom">` : h`<span class="ortobom">ORTOBOM</span>`);
+export const ortobom = () => (LOGO_ORTOBOM ? h`<img class="logo-ortobom" src="${LOGO_ORTOBOM}" alt="Ortobom" decoding="async">` : h`<span class="ortobom">ORTOBOM</span>`);
 
 export function placeholder(texto, icone = true) {
   return h`<div class="ph">${icone ? ic.camera() : ''}${texto}</div>`;

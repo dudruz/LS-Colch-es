@@ -9,7 +9,7 @@ export const FUSO = 'America/Sao_Paulo';
 export const DDI = '55';
 
 // Logo oficial da Ortobom (ex.: 'assets/img/ortobom.svg'). Vazio = mostra o nome em texto.
-export const LOGO_ORTOBOM = 'https://tse2.mm.bing.net/th/id/OIP.G0RP7YYaEO1GArWOHJ42IgHaBF?r=0&rs=1&pid=ImgDetMain&o=7&rm=3';
+export const LOGO_ORTOBOM = 'assets/img/ortobom.png';
 
 // Rastreamento para o tráfego pago. Deixe vazio até ter os IDs.
 export const META_PIXEL_ID = '';
