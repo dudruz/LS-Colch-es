@@ -1,5 +1,5 @@
 // Site · Página de produto (produto.html?p=slug)
-import { iniciarPagina, h, raw, ic, $, $$, fmt, urlMidia, site, linkZap, linkMapa, cardProduto, revelar, ortobom, placeholder, barrasFirmeza, nomeFirmeza, rastrear } from './comum.js';
+import { iniciarPagina, h, raw, ic, $, $$, fmt, urlMidia, site, linkZap, linkMapa, cardProduto, revelar, ortobom, placeholder, barrasFirmeza, nomeFirmeza, rastrear, textoParcela, parcelas } from './comum.js';
 
 const SELOS = { mais_escolhido: 'Mais escolhido', novidade: 'Novidade', oferta: 'Oferta' };
 let p;
@@ -47,7 +47,8 @@ function render() {
         <div>
           <small style="font-size:12px;color:var(--mut)">${v ? v.tamanho + ' · ' : ''}${p.variacoes.length > 1 ? 'preço' : 'a partir de'}</small>
           <div class="valor">${fmt.reais(v ? v.preco : p.preco_a_partir)}${v && v.preco_normal > v.preco ? h` <s style="font-size:20px;color:var(--mut)">${fmt.reais(v.preco_normal)}</s>` : ''}</div>
-          <span style="font-size:14px">em até 10x no cartão · consulte condição no Pix</span>
+          <div style="margin-top:6px;font-size:16px">${textoParcela(v ? v.preco : p.preco_a_partir)} no cartão</div>
+          <span style="font-size:13px;color:var(--mut)">No Pix, consulte a condição com o consultor.</span>
           ${v?.pronta_entrega ? h`<div style="margin-top:10px"><span class="pronta">● Pronta entrega</span></div>` : ''}
         </div>
         <a class="btn btn-navy btn-g btn-bloco" href="${linkZap(msgCompra())}" target="_blank" rel="noopener" data-zap>${ic.zap(22)} Comprar pelo WhatsApp</a>
@@ -55,7 +56,7 @@ function render() {
         <ul class="confianca">
           <li>${ic.escudo()} Garantia de fábrica ${p.fabricante || 'Ortobom'}</li>
           <li>${ic.caminhao()} Entrega e montagem na região</li>
-          <li>${ic.cartao()} Parcele no cartão</li>
+          <li>${ic.cartao()} <strong>${parcelas()}x sem juros</strong> no cartão</li>
         </ul>
       </div>
       <div style="display:flex;align-items:center;gap:16px;padding:18px 20px;border-radius:20px;background:#F1EDE1">

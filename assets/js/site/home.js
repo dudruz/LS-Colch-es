@@ -1,5 +1,5 @@
 // Site · Página inicial
-import { iniciarPagina, h, raw, ic, $, $$, selo, fmt, urlMidia, site, linkZap, linkMapa, cardProduto, revelar, hidratar, placeholder, rastrear } from './comum.js';
+import { iniciarPagina, h, raw, ic, $, $$, selo, fmt, urlMidia, site, linkZap, linkMapa, cardProduto, revelar, hidratar, placeholder, rastrear, parcelas, textoParcela } from './comum.js';
 
 const PADRAO = [{
   eyebrow: 'Loja de colchões em Lagoa Santa', titulo_1: 'Conforto que acolhe.', titulo_2: 'Sono que transforma.',
@@ -11,7 +11,7 @@ const BENEFICIOS = [
   ['chat', 'Atendimento consultivo', 'A gente ajuda você a escolher, sem empurrar produto.'],
   ['escudo', 'Garantia de fábrica', 'Produtos Ortobom com garantia do fabricante.'],
   ['caminhao', 'Entrega e montagem', 'Combinamos o melhor dia para entregar e montar.'],
-  ['cartao', 'Parcelamento', 'Parcele no cartão ou pague no Pix.']
+  ['cartao', '{N}x sem juros', 'Parcele em até {N}x sem juros no cartão ou pague no Pix.']
 ];
 const CATS_TXT = {
   colchoes: 'Molas ensacadas, bonnel, espuma e híbridos.',
@@ -59,6 +59,7 @@ function montarHero(d) {
           <a class="btn btn-ouro btn-g pulsa" href="${dst.href}" ${dst.externo ? raw('target="_blank" rel="noopener"') : ''} ${dst.zap ? raw('data-zap') : ''}>${b.botao_texto || 'Saiba mais'} ${ic.seta()}</a>
           <a class="btn btn-claro btn-g" href="catalogo.html">Ver colchões</a>
         </div>
+        <p class="hero-parcela">${ic.cartao(20)}<span>Em até <strong>${parcelas()}x sem juros</strong> no cartão</span></p>
       </div>
       <div class="slide-midia">
         <div class="arco">${midiaBanner(b)}</div>
@@ -115,6 +116,7 @@ function montarOferta(c) {
         <div><small style="font-size:13px;color:var(--mut)">a partir de</small><div class="serif" style="font-weight:600;font-size:54px;line-height:1;color:var(--navy)">${fmt.reais(p.preco_a_partir)}</div></div>
         ${p.preco_normal_a_partir > p.preco_a_partir ? h`<div style="padding-bottom:6px;font-size:14px;color:var(--mut)">de <s>${fmt.reais(p.preco_normal_a_partir)}</s></div>` : ''}
       </div>
+      <p style="margin:10px 0 0;font-size:16px">${textoParcela(p.preco_a_partir)} no cartão</p>
       ${c.mostrar_contagem && c.termina_em ? h`
       <div style="margin-top:30px">
         <span style="font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--navy)">A CONDIÇÃO TERMINA EM</span>
@@ -154,7 +156,8 @@ async function enviarLead(form) {
   const d = await iniciarPagina('inicio');
   montarHero(d);
   $('#palavras').innerHTML = String(h`${[...PALAVRAS, ...PALAVRAS].map((p) => h`<span>${p}</span>`)}`);
-  $('#beneficios').innerHTML = String(h`${BENEFICIOS.map(([i, t, x]) => h`<div class="benef rv"><span class="icone-box">${ic[i](26)}</span><div><h3>${t}</h3><p>${x}</p></div></div>`)}`);
+  const n = (t) => t.replaceAll('{N}', parcelas());
+  $('#beneficios').innerHTML = String(h`${BENEFICIOS.map(([i, t, x]) => h`<div class="benef rv ${i === 'cartao' ? 'destaque' : ''}"><span class="icone-box">${ic[i](26)}</span><div><h3>${n(t)}</h3><p>${n(x)}</p></div></div>`)}`);
 
   const cats = (d.categorias || []).slice(0, 4);
   $('#categorias').innerHTML = String(h`${cats.map((c) => h`
@@ -162,7 +165,7 @@ async function enviarLead(form) {
       <div class="img"><img src="assets/img/fotos/cat-${c.slug}.jpg" alt="" loading="lazy" data-falta="Foto: ${c.nome}"></div>
       <h3>${c.nome}</h3><p>${CATS_TXT[c.slug] || ''}</p>
     </a>`)}`);
-  $('#tamanhos').innerHTML = String(h`${(d.tamanhos || []).filter((t) => t.codigo !== 'SS').map((t) => h`<a class="chip" href="catalogo.html?tamanho=${t.codigo}">${t.nome} <small>${t.largura_cm} × ${t.comprimento_cm}</small></a>`)}`);
+  $('#tamanhos').innerHTML = String(h`${(d.tamanhos || []).map((t) => h`<a class="chip" href="catalogo.html?tamanho=${t.codigo}">${t.nome} <small>${t.largura_cm} × ${t.comprimento_cm}</small></a>`)}`);
 
   montarOferta(d.campanha);
 

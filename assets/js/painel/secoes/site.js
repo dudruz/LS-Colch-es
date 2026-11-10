@@ -245,6 +245,7 @@ async function loja(S) {
         <label class="lbl">Segunda a sexta<input class="inp" name="h_seg_sex" value="${hr.seg_sex || ''}" placeholder="9h às 18h" ${dis}></label>
         <label class="lbl">Sábado<input class="inp" name="h_sabado" value="${hr.sabado || ''}" placeholder="9h às 13h" ${dis}></label>
         <label class="lbl">Domingo e feriados<input class="inp" name="h_domingo" value="${hr.domingo || ''}" placeholder="Fechado" ${dis}></label>
+        <label class="lbl">Parcelas sem juros no cartão<input class="inp" name="parcelas" type="number" min="1" max="24" value="${c.parcelas_sem_juros ?? 12}" ${dis}><small class="mut" style="font-weight:500">Aparece no topo, no banner, nos preços e no FAQ</small></label>
       </div></section>
     <aside class="pilha" style="flex:1 1 300px;gap:16px">
       <section class="card pilha"><span class="rot">Banners</span>
@@ -271,11 +272,14 @@ async function loja(S) {
       if (!(tempo >= 3000 && tempo <= 20000)) throw new Error('O tempo do banner deve ficar entre 3 e 20 segundos.');
       if (f.get('leads_destino') === 'fixo' && !f.get('leads_responsavel_id')) throw new Error('Escolha quem recebe os leads.');
       if (txt('whatsapp') && txt('whatsapp').replace(/\D/g, '').length < 10) throw new Error('Confira o WhatsApp (com DDD).');
+      const parcelas = Number(f.get('parcelas'));
+      if (!(parcelas >= 1 && parcelas <= 24)) throw new Error('As parcelas sem juros devem ficar entre 1 e 24.');
       await painel.site.salvarConfig({
         whatsapp: txt('whatsapp'), instagram: txt('instagram'), mensagem_whatsapp: txt('mensagem_whatsapp') || 'Olá! Vim pelo site da LS Colchões e quero ajuda para escolher.',
         endereco: txt('endereco'), maps_url: txt('maps_url'),
         horarios: { seg_sex: txt('h_seg_sex') || '', sabado: txt('h_sabado') || '', domingo: txt('h_domingo') || '' },
         troca_automatica: lerSw(form, 'troca_automatica'), destaques_automaticos: lerSw(form, 'destaques_automaticos'), tempo_slide_ms: tempo,
+        parcelas_sem_juros: parcelas,
         leads_destino: f.get('leads_destino'), leads_responsavel_id: f.get('leads_destino') === 'fixo' ? f.get('leads_responsavel_id') : null
       });
       toast('Dados da loja salvos.', 'ok');

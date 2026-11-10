@@ -5,7 +5,6 @@
 
 insert into public.tamanhos (codigo, nome, largura_cm, comprimento_cm, ordem) values
   ('S',  'Solteiro',       88,  188, 1),
-  ('SS', 'Solteirão',      96,  203, 2),
   ('V',  'Viúva',         128,  188, 3),
   ('C',  'Casal',         138,  188, 4),
   ('Q',  'Queen',         158,  198, 5),

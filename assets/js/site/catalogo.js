@@ -2,7 +2,7 @@
 import { iniciarPagina, h, raw, $, $$, site, cardProduto, revelar } from './comum.js';
 
 const USO = {
-  S: 'Uma pessoa, quartos menores e quarto de criança.', SS: 'Uma pessoa alta ou que gosta de espaço.',
+  S: 'Uma pessoa, quartos menores e quarto de criança.',
   V: 'Uma pessoa que gosta de espaço de sobra.', C: 'O tamanho mais comum para duas pessoas.',
   Q: 'Duas pessoas, com mais largura e comprimento.', K: 'Máximo espaço para o casal, ou casal com criança.'
 };
