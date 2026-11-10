@@ -146,8 +146,21 @@ export const site = {
     p_mensagem: d.mensagem || null,
     p_pagina: d.pagina || location.pathname,
     p_utm: utmDaVisita(),
-    p_campo_extra: d.campoExtra || null
+    p_campo_extra: d.campoExtra || null,
+    p_bairro: d.bairro || null
   }).then(ok),
+
+  /** Clique no WhatsApp do site: conta para a campanha do anúncio (não trava a página se falhar) */
+  registrarEvento(tipo = 'whatsapp') {
+    supabase.rpc('registrar_evento_site', { p_tipo: tipo, p_pagina: location.pathname, p_utm: utmDaVisita() }).then(() => {}, () => {});
+  },
+
+  /** Código curto da campanha para ir no fim da mensagem do WhatsApp (o vendedor escolhe a campanha no CRM) */
+  refCampanha() {
+    const u = utmDaVisita();
+    if (!u) return null;
+    return (u.utm_campaign || (u.gclid ? 'google' : u.fbclid ? 'meta' : u.utm_source || '')).toLowerCase().slice(0, 40) || null;
+  },
 
   linkWhatsApp(numero, mensagem = '') {
     let n = digitos(numero);
@@ -186,6 +199,21 @@ async function meuId() {
 // PAINEL
 // =====================================================================
 export const painel = {
+  /** Tráfego pago: campanhas, investimento, motivos de perda, regiões e leads sem resposta */
+  trafego(tipo = 'mes', de = null, ate = null) {
+    const p = periodo(tipo, de, ate);
+    return supabase.rpc('painel_trafego', { p_inicio: p.inicio, p_fim: p.fim }).then(ok);
+  },
+
+  campanhas: {
+    listar: () => supabase.from('campanhas_trafego').select('*, campanha_investimentos(id, mes, valor)').order('ativa', { ascending: false }).order('nome').then(ok),
+    ativas: () => supabase.from('campanhas_trafego').select('id, nome, codigo, plataforma').eq('ativa', true).order('nome').then(ok),
+    salvar: (c) => supabase.from('campanhas_trafego').upsert(c).select().single().then(ok),
+    remover: (id) => supabase.from('campanhas_trafego').delete().eq('id', id).then(ok),
+    salvarInvestimento: (i) => supabase.from('campanha_investimentos').upsert(i, { onConflict: 'campanha_id,mes' }).then(ok),
+    removerInvestimento: (id) => supabase.from('campanha_investimentos').delete().eq('id', id).then(ok)
+  },
+
   /** Visão geral. tipo = hoje | 7d | 30d | mes | mespassado | custom */
   dashboard(tipo = 'mes', de = null, ate = null) {
     const p = periodo(tipo, de, ate);
@@ -284,13 +312,17 @@ export const painel = {
       if (responsavelId) q = q.eq('responsavel_id', responsavelId);
       return q.then(ok);
     },
-    mover: (id, etapa, motivoPerda = null) =>
-      supabase.from('leads').update(etapa === 'perdido' ? { etapa, motivo_perda: motivoPerda } : { etapa }).eq('id', id).select().single().then(ok),
+    /** categoria (perdido) = preco | prazo | sem_resposta | concorrente | desconhecido */
+    mover: (id, etapa, motivoPerda = null, categoria = null) =>
+      supabase.from('leads').update(etapa === 'perdido' ? { etapa, motivo_perda: motivoPerda, motivo_categoria: categoria || 'desconhecido' } : { etapa })
+        .eq('id', id).select().single().then(ok),
+    semResposta: (id) => supabase.rpc('lead_sem_resposta', { p_lead: id }).then(ok),
+    registrarContato: (id) => supabase.rpc('lead_registrar_contato', { p_lead: id }).then(ok),
     atribuir: (id, responsavelId) => supabase.from('leads').update({ responsavel_id: responsavelId }).eq('id', id).then(ok),
     atualizar: (id, campos) => supabase.from('leads').update(campos).eq('id', id).then(ok),
     agendarRetorno: (id, quando) => supabase.from('leads').update({ proximo_contato: quando }).eq('id', id).then(ok),
     /** Lead manual (WhatsApp, Instagram, loja). Cria o cliente se precisar. */
-    async criar({ cliente, origem = 'whatsapp', interesses = [], tamanho = null, mensagem = null, valorEstimado = null, responsavelId = null }) {
+    async criar({ cliente, origem = 'whatsapp', interesses = [], tamanho = null, mensagem = null, valorEstimado = null, responsavelId = null, campanhaId = null }) {
       let clienteId = cliente.id;
       if (!clienteId) {
         const novo = await painel.clientes.salvar({ nome: cliente.nome, whatsapp: cliente.whatsapp, email: cliente.email || null, origem });
@@ -298,7 +330,7 @@ export const painel = {
       }
       const lead = await supabase.from('leads').insert({
         cliente_id: clienteId, origem, interesses, tamanho_codigo: tamanho, mensagem,
-        valor_estimado: valorEstimado, responsavel_id: responsavelId || await meuId()
+        valor_estimado: valorEstimado, responsavel_id: responsavelId || await meuId(), campanha_trafego_id: campanhaId
       }).select().single().then(ok);
       await painel.leads.anotar({ clienteId, leadId: lead.id, tipo: 'criado', texto: 'Lead cadastrado no painel · ' + origem });
       return lead;

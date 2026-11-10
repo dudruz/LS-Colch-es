@@ -31,7 +31,11 @@ export async function carregarDados({ fresco = false } = {}) {
 
 export const cfg = () => dados?.config || {};
 const MSG_PADRAO = 'Olá! Vim pelo site da LS Colchões e quero ajuda para escolher.';
-export const linkZap = (msg) => site.linkWhatsApp(cfg().whatsapp, msg || cfg().mensagem_whatsapp || MSG_PADRAO);
+export const linkZap = (msg) => {
+  const ref = site.refCampanha();
+  const texto = (msg || cfg().mensagem_whatsapp || MSG_PADRAO) + (ref ? ` (ref: ${ref})` : '');
+  return site.linkWhatsApp(cfg().whatsapp, texto);
+};
 export const linkMapa = () => cfg().maps_url || 'https://www.google.com/maps/search/?api=1&query=Av.+Pref.+Jo%C3%A3o+Daher+1277+Lagoa+Santa+MG';
 export const endereco = () => cfg().endereco || 'Av. Pref. João Daher, 1277, loja 3 · Lagoa Santa/MG';
 export function horarioTexto() {
@@ -253,6 +257,7 @@ document.addEventListener('error', (e) => {
 // Inicialização de toda página
 // ---------------------------------------------------------------------
 export async function iniciarPagina(ativa) {
+  site.utmDaVisita(); // guarda a campanha do anúncio para as próximas páginas
   iniciarRastreamento();
   const d = await carregarDados();
   const topoEl = $('#topo');
@@ -281,7 +286,7 @@ export async function iniciarPagina(ativa) {
     });
   }
   // qualquer clique em WhatsApp conta como contato no Pixel/GA4
-  document.addEventListener('click', (e) => { if (e.target.closest('[data-zap]')) rastrear('Contact'); });
+  document.addEventListener('click', (e) => { if (e.target.closest('[data-zap]')) { rastrear('Contact'); site.registrarEvento('whatsapp'); } });
   hidratar();
   tickContagens();
   setInterval(tickContagens, 1000);

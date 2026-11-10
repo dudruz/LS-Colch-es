@@ -15,6 +15,7 @@ export const icp = {
   metas: (w) => svg('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.3"/>', w),
   produtos: (w) => svg('<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.3"/>', w),
   site: (w) => svg('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>', w),
+  trafego: (w) => svg('<path d="M3 10v4h3l6 4V6L6 10z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.8 6a8.5 8.5 0 0 1 0 12"/>', w),
   equipe: (w) => svg('<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2 .8 3.5 3 3.5 6"/>', w),
   sair: (w = 18) => svg('<path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/>', w),
   mais: (w = 18) => svg('<path d="M12 5v14M5 12h14"/>', w),
@@ -48,8 +49,11 @@ export const ROT = {
   pedidos: { pedido: 'Pedido feito', faturado: 'Faturado', em_transito: 'Em trânsito', recebido: 'Recebido', cancelado: 'Cancelado' },
   papeis: { admin: 'Administrador', gerente: 'Gerente', vendedor: 'Vendedor', entregador: 'Entregador', leitura: 'Só leitura' },
   movimentos: { entrada: 'Entrada', saida: 'Saída', reserva: 'Reserva', liberacao: 'Liberação', ajuste: 'Ajuste' },
-  selos: { mais_escolhido: 'Mais escolhido', novidade: 'Novidade', oferta: 'Oferta' }
+  selos: { mais_escolhido: 'Mais escolhido', novidade: 'Novidade', oferta: 'Oferta' },
+  motivos: { preco: 'Preço / valor', prazo: 'Prazo de entrega', sem_resposta: 'Não respondeu', concorrente: 'Comprou em outro lugar', desconhecido: 'Desconhecido' },
+  plataformas: { meta: 'Meta (Face/Insta)', google: 'Google Ads', outra: 'Outra' }
 };
+export const tagPlataforma = (p) => h`<span class="tag ${p === 'google' ? 'o-site' : p === 'meta' ? 'o-instagram' : 'o-outro'}">${{ meta: 'Meta', google: 'Google', outra: 'Outra' }[p] || p}</span>`;
 
 export const pill = (status, mapa = 'status') => {
   const cls = (mapa === 'status' ? ROT.statusClasse : ROT.statusEntregaClasse)[status] || 'st-mute';

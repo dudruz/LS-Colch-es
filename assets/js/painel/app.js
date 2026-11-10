@@ -11,6 +11,7 @@ const app = $('#app');
 const TODOS = ['admin', 'gerente', 'vendedor', 'entregador', 'leitura'];
 const SECOES = [
   { id: 'inicio', nome: 'Visão geral', grupo: 'Gestão', papeis: ['admin', 'gerente', 'vendedor', 'leitura'] },
+  { id: 'trafego', nome: 'Tráfego e campanhas', papeis: ['admin', 'gerente', 'leitura'] },
   { id: 'vendas', nome: 'Vendas', papeis: ['admin', 'gerente', 'vendedor', 'leitura'] },
   { id: 'crm', nome: 'CRM e leads', badge: 'leads', papeis: ['admin', 'gerente', 'vendedor', 'leitura'] },
   { id: 'entregas', nome: 'Entregas e agenda', grupo: 'Operação', badge: 'entregas', papeis: TODOS },
@@ -216,6 +217,9 @@ async function navegar() {
 
   try { limpar?.(); } catch { /* ignora */ }
   limpar = null;
+  // gaveta ou janela aberta não acompanham a troca de tela
+  $$('[data-fechar-gaveta]').forEach((b) => b.click());
+  $$('dialog[open]').forEach((dl) => dl.close());
   const minha = ++geracao;
   const antigo = $('#conteudo');
   const el = document.createElement('div');
