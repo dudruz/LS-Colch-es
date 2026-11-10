@@ -30,6 +30,9 @@ export async function carregarDados({ fresco = false } = {}) {
 }
 
 export const cfg = () => dados?.config || {};
+/** Parcelas sem juros no cartão (Painel → Gestão do site → Dados da loja) */
+export const parcelas = () => Number(cfg().parcelas_sem_juros) || 12;
+export const textoParcela = (valor) => h`<span class="parcela">ou <strong>${parcelas()}x de ${fmt.reaisCentavos(Number(valor) / parcelas())}</strong> sem juros</span>`;
 const MSG_PADRAO = 'Olá! Vim pelo site da LS Colchões e quero ajuda para escolher.';
 export const linkZap = (msg) => {
   const ref = site.refCampanha();
@@ -100,6 +103,7 @@ function topo(ativa) {
     <nav class="nav" id="menu-principal" aria-label="Principal">
       ${PAGINAS.map(([id, nome, href]) => h`<a href="${href}" ${id === ativa ? raw('aria-current="page"') : ''}>${nome}</a>`)}
     </nav>
+    <span class="topo-parcela">${ic.cartao(18)} <span><strong>${parcelas()}x sem juros</strong><small>no cartão</small></span></span>
     <a class="btn btn-navy" href="${linkZap()}" target="_blank" rel="noopener" data-zap>${ic.zap()} Falar com consultor</a>
     <button class="menu-btn" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="menu-principal">${ic.menu()}</button>
   </div>`;
@@ -216,7 +220,7 @@ export function cardProduto(p, classe = '') {
       <div class="preco">
         <small>a partir de</small>
         <strong>${fmt.reais(p.preco_a_partir)}${p.na_campanha && p.preco_normal_a_partir > p.preco_a_partir ? h`<s>${fmt.reais(p.preco_normal_a_partir)}</s>` : ''}</strong>
-        <span>ou em até 10x no cartão</span>
+        ${textoParcela(p.preco_a_partir)}
       </div>
       <div class="card-acoes">
         <a class="btn btn-contorno" href="${url}">Ver detalhes</a>
@@ -238,7 +242,7 @@ export function hidratar(raiz = document) {
   $$('[data-ic]', raiz).forEach((el) => { const f = ic[el.dataset.ic]; if (f) el.outerHTML = String(f()); });
   $$('[data-zap-msg]', raiz).forEach((el) => { el.href = linkZap(el.dataset.zapMsg); el.dataset.zap = ''; });
   $$('[data-mapa]', raiz).forEach((el) => { el.href = linkMapa(); });
-  const info = { endereco: endereco(), horario: horarioTexto(), instagram: cfg().instagram || '@ls_colchoes' };
+  const info = { endereco: endereco(), horario: horarioTexto(), instagram: cfg().instagram || '@ls_colchoes', parcelas: `${parcelas()}x sem juros` };
   $$('[data-info]', raiz).forEach((el) => { el.textContent = info[el.dataset.info] || ''; });
   $$('[data-foto]', raiz).forEach((el) => {
     el.innerHTML = String(h`<img src="assets/img/${el.dataset.foto}" alt="${el.dataset.alt || ''}" loading="lazy" data-falta="${el.dataset.falta || 'Foto'}">`);
