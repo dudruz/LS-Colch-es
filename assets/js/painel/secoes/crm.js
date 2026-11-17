@@ -196,6 +196,7 @@ async function detalheLead(ctx, lead, vendedores, campanhas, { carregar, mover }
         ${lead.mensagem ? h`<div><span class="rot">Mensagem</span><p class="clr" style="margin:6px 0 0;white-space:pre-wrap">${lead.mensagem}</p></div>` : ''}
       </div>
       <form class="g2" data-form-lead>
+        <label class="lbl" style="grid-column:1/-1">Data de início <small class="mut">(quando o cliente chamou — conta nos leads do dia)</small><input class="inp" name="inicio" type="datetime-local" value="${isoParaLocal(lead.criado_em)}" max="${isoParaLocal(new Date().toISOString())}" ${pode ? '' : raw('disabled')}></label>
         <label class="lbl">Etapa<select class="inp" name="etapa" ${pode ? '' : raw('disabled')}>${opcoes(ROT.etapas, lead.etapa)}</select></label>
         <label class="lbl">Responsável<select class="inp" name="responsavel" ${ctx.pode.admin ? '' : raw('disabled')}><option value="">Sem responsável</option>${vendedores.map((v) => h`<option value="${v.id}" ${lead.responsavel_id === v.id ? raw('selected') : ''}>${v.nome}</option>`)}</select></label>
         <label class="lbl">Próximo contato<input class="inp" name="retorno" type="datetime-local" value="${isoParaLocal(lead.proximo_contato)}" ${pode ? '' : raw('disabled')}></label>
@@ -220,6 +221,12 @@ async function detalheLead(ctx, lead, vendedores, campanhas, { carregar, mover }
     try {
       if (n === 'etapa') { g.fechar(); return mover(lead, e.target.value); }
       if (n === 'responsavel') { await painel.leads.atribuir(lead.id, e.target.value || null); lead.responsavel_id = e.target.value || null; lead.responsavel = vendedores.find((v) => v.id === e.target.value)?.nome || null; }
+      if (n === 'inicio') {
+        if (!e.target.value) return;
+        await painel.leads.mudarInicio(lead.id, localParaIso(e.target.value));
+        lead.criado_em = localParaIso(e.target.value);
+        render();
+      }
       if (n === 'retorno') { await painel.leads.agendarRetorno(lead.id, localParaIso(e.target.value)); lead.proximo_contato = localParaIso(e.target.value); }
       if (n === 'valor') { await painel.leads.atualizar(lead.id, { valor_estimado: e.target.value || null }); lead.valor_estimado = e.target.value || null; }
       if (n === 'campanha') {
@@ -281,6 +288,8 @@ async function novoLead(ctx, vendedores, campanhas, aoSalvar) {
     corpo: h`<div class="g2">
       <label class="lbl">Nome<input class="inp" name="nome" required maxlength="120"></label>
       <label class="lbl">WhatsApp<input class="inp" name="whatsapp" type="tel" required placeholder="(31) 9 0000-0000"></label>
+      <label class="lbl">Data de início <small class="mut">(quando o cliente chamou)</small><input class="inp" name="inicio" type="datetime-local" required value="${isoParaLocal(new Date().toISOString())}" max="${isoParaLocal(new Date().toISOString())}"></label>
+      <label class="lbl">Etapa<select class="inp" name="etapa">${opcoes(ROT.etapas, 'novo')}</select></label>
       <label class="lbl">Origem<select class="inp" name="origem">${opcoes(ROT.origens, 'whatsapp')}</select></label>
       <label class="lbl">Tamanho<select class="inp" name="tamanho"><option value="">Não sabe ainda</option>${base.tamanhos.map((t) => h`<option value="${t.codigo}">${t.nome}</option>`)}</select></label>
       <label class="lbl">Interesse<input class="inp" name="interesses" placeholder="Ex.: colchão, box baú"></label>
@@ -299,7 +308,9 @@ async function novoLead(ctx, vendedores, campanhas, aoSalvar) {
         cliente, origem: f.get('origem'), tamanho: f.get('tamanho') || null, mensagem: f.get('mensagem') || null,
         interesses: String(f.get('interesses') || '').split(',').map((s) => s.trim()).filter(Boolean),
         valorEstimado: f.get('valor') ? Number(f.get('valor')) : null, responsavelId: f.get('responsavel') || null,
-        campanhaId: f.get('campanha') || null
+        campanhaId: f.get('campanha') || null,
+        inicio: localParaIso(String(f.get('inicio') || '')) || null,
+        etapa: f.get('etapa') || 'novo'
       });
       toast(cliente.id ? `Lead criado para ${cliente.nome} (cliente já cadastrado).` : 'Lead cadastrado.', 'ok');
     }
