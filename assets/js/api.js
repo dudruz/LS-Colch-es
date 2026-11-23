@@ -375,7 +375,7 @@ export const painel = {
     definirMinimo: (variacaoId, minimo) => supabase.from('produto_variacoes').update({ estoque_minimo: minimo }).eq('id', variacaoId).then(ok),
     pedidos: () => supabase.from('pedidos_fabrica')
       .select('*, pedido_fabrica_itens(quantidade, produto_variacoes(sku, tamanho_codigo, produtos(nome)))')
-      .order('feito_em', { ascending: false }).limit(20).then(ok),
+      .order('feito_em', { ascending: false }).limit(60).then(ok),
     async criarPedido({ codigo, previsao = null, observacao = null, itens }) {
       if (!itens?.length) throw new ErroApi('Inclua pelo menos um item no pedido.');
       const pedido = await supabase.from('pedidos_fabrica')
@@ -385,6 +385,7 @@ export const painel = {
       return pedido;
     },
     statusPedido: (id, status) => supabase.from('pedidos_fabrica').update({ status }).eq('id', id).then(ok),
+    previsaoPedido: (id, previsao) => supabase.from('pedidos_fabrica').update({ previsao: previsao || null }).eq('id', id).then(ok),
     receberPedido: (id) => supabase.rpc('receber_pedido_fabrica', { p_pedido: id }).then(ok)
   },
 
