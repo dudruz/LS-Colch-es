@@ -321,22 +321,29 @@ export const painel = {
     atribuir: (id, responsavelId) => supabase.from('leads').update({ responsavel_id: responsavelId }).eq('id', id).then(ok),
     atualizar: (id, campos) => supabase.from('leads').update(campos).eq('id', id).then(ok),
     agendarRetorno: (id, quando) => supabase.from('leads').update({ proximo_contato: quando }).eq('id', id).then(ok),
-    /** Lead manual (WhatsApp, Instagram, loja). Cria o cliente se precisar. */
-    async criar({ cliente, origem = 'whatsapp', interesses = [], tamanho = null, mensagem = null, valorEstimado = null, responsavelId = null, campanhaId = null }) {
+    /** Lead manual (WhatsApp, Instagram, loja). Cria o cliente se precisar.
+     *  inicio = data/hora real em que o cliente chamou (ISO). Vazio = agora.
+     *  etapa  = etapa em que o lead já está (lead lançado depois já pode estar em atendimento/orçamento). */
+    async criar({ cliente, origem = 'whatsapp', interesses = [], tamanho = null, mensagem = null, valorEstimado = null, responsavelId = null, campanhaId = null, inicio = null, etapa = 'novo' }) {
       let clienteId = cliente.id;
       if (!clienteId) {
-        const novo = await painel.clientes.salvar({ nome: cliente.nome, whatsapp: cliente.whatsapp, email: cliente.email || null, origem });
+        const novo = await painel.clientes.salvar({ nome: cliente.nome, whatsapp: cliente.whatsapp, email: cliente.email || null, origem, ...(inicio ? { criado_em: inicio } : {}) });
         clienteId = novo.id;
       }
       const lead = await supabase.from('leads').insert({
-        cliente_id: clienteId, origem, interesses, tamanho_codigo: tamanho, mensagem,
-        valor_estimado: valorEstimado, responsavel_id: responsavelId || await meuId(), campanha_trafego_id: campanhaId
+        cliente_id: clienteId, origem, interesses, tamanho_codigo: tamanho, mensagem, etapa,
+        valor_estimado: valorEstimado, responsavel_id: responsavelId || await meuId(), campanha_trafego_id: campanhaId,
+        ...(inicio ? { criado_em: inicio } : {}),
+        // lançado depois e já atendido: o 1º contato conta a partir da data de início, não de agora
+        ...(inicio && etapa !== 'novo' ? { primeiro_contato_em: inicio } : {})
       }).select().single().then(ok);
-      await painel.leads.anotar({ clienteId, leadId: lead.id, tipo: 'criado', texto: 'Lead cadastrado no painel · ' + origem });
+      await painel.leads.anotar({ clienteId, leadId: lead.id, tipo: 'criado', texto: 'Lead cadastrado no painel · ' + origem, quando: inicio });
       return lead;
     },
-    anotar: async ({ clienteId, leadId = null, tipo = 'nota', texto }) =>
-      supabase.from('lead_eventos').insert({ cliente_id: clienteId, lead_id: leadId, tipo, descricao: texto, usuario_id: await meuId() }).then(ok),
+    /** Muda a data de início (quando o cliente chamou de verdade) */
+    mudarInicio: (id, inicio) => supabase.from('leads').update({ criado_em: inicio }).eq('id', id).then(ok),
+    anotar: async ({ clienteId, leadId = null, tipo = 'nota', texto, quando = null }) =>
+      supabase.from('lead_eventos').insert({ cliente_id: clienteId, lead_id: leadId, tipo, descricao: texto, usuario_id: await meuId(), ...(quando ? { criado_em: quando } : {}) }).then(ok),
     /** Avisa na hora quando entra um lead novo (pelo site ou por outra pessoa) */
     aoNovoLead(cb) {
       const canal = supabase.channel('leads-novos-' + crypto.randomUUID().slice(0, 8))
