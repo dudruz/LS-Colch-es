@@ -286,6 +286,23 @@ export const painel = {
     alterarStatus: (id, status) => supabase.from('vendas').update({ status }).eq('id', id).select().single().then(ok)
   },
 
+  // ---------------- ORÇAMENTOS ----------------
+  orcamentos: {
+    async listar({ busca, status, limite = 100 } = {}) {
+      let q = supabase.from('v_orcamentos').select('*').order('criado_em', { ascending: false }).limit(limite);
+      if (status) q = q.eq('status', status);
+      if (busca) q = q.ilike('cliente', `%${limparBusca(busca)}%`);
+      return q.then(ok);
+    },
+    obter: (id) => supabase.from('v_orcamentos').select('*').eq('id', id).maybeSingle().then(ok),
+    /** o = { id?, cliente_id, lead_id, opcoes, frete_tipo, frete_valor, parcelas, validade, observacoes, mensagem, total, status } */
+    salvar: (o) => supabase.from('orcamentos').upsert(o).select().single().then(ok),
+    alterarStatus: (id, status) => supabase.from('orcamentos').update({ status }).eq('id', id).then(ok),
+    /** Lead em aberto mais recente do cliente (para ligar o orçamento) */
+    leadAberto: (clienteId) => supabase.from('leads').select('id, etapa').eq('cliente_id', clienteId)
+      .not('etapa', 'in', '(vendido,perdido)').order('criado_em', { ascending: false }).limit(1).maybeSingle().then(ok)
+  },
+
   // ---------------- CLIENTES ----------------
   clientes: {
     buscar(termo) {

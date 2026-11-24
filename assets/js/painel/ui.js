@@ -9,6 +9,7 @@ const svg = (d, w = 20) => raw(`<svg width="${w}" height="${w}" viewBox="0 0 24 
 export const icp = {
   inicio: (w) => svg('<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>', w),
   vendas: (w) => svg('<path d="M5 7h14l-1.2 12.1a2 2 0 0 1-2 1.9H8.2a2 2 0 0 1-2-1.9z"/><path d="M9 7a3 3 0 0 1 6 0"/>', w),
+  orcamentos: (w) => svg('<path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 12h6M10 16h6"/>', w),
   crm: (w) => svg('<path d="M3 5h18l-7 8.5V20l-4-2v-4.5z"/>', w),
   entregas: (w) => svg('<path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/>', w),
   estoque: (w) => svg('<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M4 7.5l8 4.5 8-4.5M12 12v9"/>', w),

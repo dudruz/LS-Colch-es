@@ -205,6 +205,7 @@ async function detalheLead(ctx, lead, vendedores, campanhas, { carregar, mover }
       </form>
       ${pode ? h`<div style="display:flex;gap:10px;flex-wrap:wrap">
         ${lead.etapa !== 'vendido' ? h`<button class="btn btn-g" data-acao="venda">Registrar venda</button>` : ''}
+        ${lead.etapa !== 'vendido' ? h`<button class="btn" data-acao="orcamento">Criar orçamento</button>` : ''}
         ${!['vendido', 'perdido'].includes(lead.etapa) ? h`<button class="btn" data-acao="sem-resposta">Tentei contato, sem resposta${lead.tentativas ? ` (${lead.tentativas})` : ''}</button>` : ''}
         ${lead.tentativas >= 3 && !['vendido', 'perdido'].includes(lead.etapa) ? h`<button class="btn btn-perigo" data-acao="perder-sem-resposta">Encerrar: não respondeu</button>` : ''}
         <button class="btn" data-acao="nota">Adicionar anotação</button>
@@ -264,6 +265,11 @@ async function detalheLead(ctx, lead, vendedores, campanhas, { carregar, mover }
         toast(`${lead.cliente} → Perdido (não respondeu)`, 'ok'); g.fechar(); carregar();
       } catch (err) { toast(err.message, 'erro'); }
       return;
+    }
+    if (a === 'orcamento') {
+      g.fechar();
+      const { novoOrcamento } = await import('./orcamentos.js');
+      return novoOrcamento(ctx, carregar, { cliente: { id: lead.cliente_id, nome: lead.cliente, whatsapp: lead.whatsapp }, leadId: lead.id });
     }
     if (a === 'venda') {
       g.fechar();

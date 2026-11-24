@@ -13,6 +13,7 @@ const SECOES = [
   { id: 'inicio', nome: 'Visão geral', grupo: 'Gestão', papeis: ['admin', 'gerente', 'vendedor', 'leitura'] },
   { id: 'trafego', nome: 'Tráfego e campanhas', papeis: ['admin', 'gerente', 'leitura'] },
   { id: 'vendas', nome: 'Vendas', papeis: ['admin', 'gerente', 'vendedor', 'leitura'] },
+  { id: 'orcamentos', nome: 'Orçamentos', papeis: ['admin', 'gerente', 'vendedor', 'leitura'] },
   { id: 'crm', nome: 'CRM e leads', badge: 'leads', papeis: ['admin', 'gerente', 'vendedor', 'leitura'] },
   { id: 'entregas', nome: 'Entregas e agenda', grupo: 'Operação', badge: 'entregas', papeis: TODOS },
   { id: 'estoque', nome: 'Estoque', badge: 'estoque', alerta: true, papeis: TODOS },
