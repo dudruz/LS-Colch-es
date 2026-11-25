@@ -303,6 +303,13 @@ export const painel = {
       .not('etapa', 'in', '(vendido,perdido)').order('criado_em', { ascending: false }).limit(1).maybeSingle().then(ok)
   },
 
+  // ---------------- FRETE ----------------
+  frete: {
+    /** Valor cobrado por km rodado (ida e volta), configurável em Entregas */
+    valorKm: () => supabase.from('site_config').select('frete_valor_km').eq('id', 1).single().then(ok).then((c) => Number(c?.frete_valor_km) || 2),
+    salvarValorKm: (v) => supabase.from('site_config').update({ frete_valor_km: v }).eq('id', 1).then(ok)
+  },
+
   // ---------------- CLIENTES ----------------
   clientes: {
     buscar(termo) {

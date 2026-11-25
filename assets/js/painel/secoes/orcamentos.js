@@ -2,10 +2,12 @@
 import { painel, fmt } from '../../api.js';
 import { h, raw, $, $$, debounce, esc } from '../../html.js';
 import { icp, toast, gaveta, carregando, vazio, erroBloco, zapCliente } from '../ui.js';
+import { custoFrete, diluir, distanciaKm, ehLagoaSanta } from '../frete.js';
 
 const STATUS = { enviado: 'Enviado', aprovado: 'Aprovado', perdido: 'Perdido', rascunho: 'Rascunho' };
 const STATUS_CLASSE = { enviado: 'st-info', aprovado: 'st-ok', perdido: 'st-mute', rascunho: 'st-wait' };
-const FRETE = { nenhum: 'Não mencionar frete', valor: 'Frete com valor (parcelável junto)', gratis: 'Frete grátis', cliente: 'Frete por conta do cliente' };
+const FRETE = { nenhum: 'Não mencionar frete', diluido: 'Frete grátis (calcula e dilui no preço)', gratis: 'Frete grátis (sem acréscimo)', valor: 'Frete com valor (parcelável junto)', cliente: 'Frete por conta do cliente' };
+const FRETE_GRATIS = ['gratis', 'diluido'];
 const LOJA = {
   nome: 'LS Colchões',
   endereco: 'Av. Pref. João Daher, 1277, loja 3 · Lagoa Santa/MG',
@@ -80,9 +82,9 @@ export default async function orcamentos(el, ctx) {
 export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
   const ex = pre.existente || null;
   const g = gaveta({ titulo: ex ? `Orçamento #${ex.numero}` : 'Novo orçamento', corpo: carregando() });
-  let produtos, base;
+  let produtos, base, valorKm;
   try {
-    [produtos, base] = await Promise.all([painel.produtos.listar(), ctx.base()]);
+    [produtos, base, valorKm] = await Promise.all([painel.produtos.listar(), ctx.base(), painel.frete.valorKm().catch(() => 2)]);
   } catch (err) { g.corpo.innerHTML = String(erroBloco(err)); return; }
   const TAM = Object.fromEntries(base.tamanhos.map((t) => [t.codigo, t]));
   produtos = produtos.filter((p) => p.produto_variacoes.some((v) => v.ativo && Number(v.preco) > 0)).sort((a, b) => a.nome.localeCompare(b.nome));
@@ -96,6 +98,7 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
   let clienteNovo = false;
   let leadId = pre.leadId || ex?.lead_id || null;
   let mensagemEditada = false;
+  let freteCidade = '';
 
   g.corpo.innerHTML = String(h`
     <form class="pilha" style="gap:20px" novalidate>
@@ -108,7 +111,14 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
       <fieldset class="g2" style="border:0;padding:0;margin:0">
         <legend class="rot" style="padding:0;margin-bottom:10px">Condições</legend>
         <label class="lbl">Frete<select class="inp" name="frete_tipo">${Object.entries(FRETE).map(([k, t]) => h`<option value="${k}" ${(ex?.frete_tipo || 'nenhum') === k ? raw('selected') : ''}>${t}</option>`)}</select></label>
-        <label class="lbl" data-frete-valor>Valor do frete (R$)<input class="inp" name="frete_valor" type="number" min="0" step="0.01" value="${ex?.frete_valor || ''}"></label>
+        <label class="lbl" data-frete-valor>Valor do frete (R$)<input class="inp" name="frete_valor" type="number" min="0" step="0.01" value="${ex?.frete_tipo === 'valor' ? ex.frete_valor || '' : ''}"></label>
+        <div class="pilha" data-frete-calc style="grid-column:1/-1;gap:8px">
+          <div class="g2">
+            <label class="lbl">Destino <small class="mut">(endereço, cidade ou CEP)</small><span style="display:flex;gap:8px"><input class="inp" name="frete_destino" value="${ex?.frete_destino || ''}" placeholder="Ex.: Rua X, 100, Vespasiano ou 33200-000"><button type="button" class="btn" data-acao="calc-km" style="flex:none">Calcular km</button></span></label>
+            <label class="lbl">Km até o cliente <small class="mut">(só ida)</small><input class="inp" name="frete_km" type="number" min="0" step="0.1" value="${ex?.frete_km ?? ''}"></label>
+          </div>
+          <span class="mut" style="font-size:12px" data-frete-info></span>
+        </div>
         <label class="lbl">Parcelas sem juros<input class="inp" name="parcelas" type="number" min="1" max="24" value="${ex?.parcelas || 12}"></label>
         <label class="lbl">Validade (dias)<input class="inp" name="validade" type="number" min="1" max="30" value="3"></label>
         <label class="lbl" style="grid-column:1/-1">Observação no fim da mensagem <small class="mut">(opcional)</small><input class="inp" name="obs" maxlength="300" value="${ex?.observacoes || ''}" placeholder="Ex.: Garantia de fábrica Ortobom: 5 anos nas molas e 3 na espuma."></label>
@@ -223,8 +233,9 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
 
   // ---------------- leitura dos dados ----------------
   function lerOpcoes() {
+    const c = condicoes();
     return $$('[data-opcao]', caixaOpcoes).map((op, i, todas) => {
-      const itens = $$('[data-item]', op).map((d) => {
+      let itens = $$('[data-item]', op).map((d) => {
         const p = produtos.find((x) => x.id === $('[data-produto]', d).value);
         const v = p?.produto_variacoes.find((x) => x.id === $('[data-variacao]', d).value);
         if (!p || !v) return null;
@@ -236,6 +247,8 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
           black: !!(precoBlack(v) && $('[data-black]', d).checked), encomenda: disp(v) < qtd
         };
       }).filter(Boolean);
+      // Frete grátis diluído: cada item recebe uma parte do frete (proporcional ao valor), arredondando para 9,90
+      if (c.freteTipo === 'diluido' && c.freteCusto > 0) itens = diluir(itens, c.freteCusto);
       const subtotal = itens.reduce((a, it) => a + it.qtd * it.preco, 0);
       return { titulo: todas.length > 1 ? `Opção ${i + 1}` : '', itens, subtotal };
     });
@@ -243,9 +256,13 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
   function condicoes() {
     const freteTipo = form.frete_tipo.value;
     const freteValor = freteTipo === 'valor' ? Number(form.frete_valor.value) || 0 : 0;
+    const freteDestino = form.frete_destino.value.trim();
+    const freteKm = form.frete_km.value === '' ? null : Math.max(0, Number(form.frete_km.value) || 0);
+    const lagoaSanta = ehLagoaSanta(freteCidade || freteDestino);
+    const freteCusto = freteTipo === 'diluido' ? custoFrete(freteKm, valorKm, freteCidade || freteDestino) : 0;
     const parcelas = Math.min(24, Math.max(1, Number(form.parcelas.value) || 12));
     const dias = Math.min(30, Math.max(1, Number(form.validade.value) || 3));
-    return { freteTipo, freteValor, parcelas, dias, obs: form.obs.value.trim() };
+    return { freteTipo, freteValor, freteDestino, freteKm, freteCusto, lagoaSanta, parcelas, dias, obs: form.obs.value.trim() };
   }
   const nomeCliente = () => cliente?.nome || form.c_nome?.value.trim() || '';
 
@@ -264,7 +281,7 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
     });
     linhas.push('');
     if (c.freteTipo === 'valor' && c.freteValor > 0) linhas.push('O frete já está incluso no total e pode ser parcelado junto.');
-    if (c.freteTipo === 'gratis') linhas.push('A entrega é por nossa conta, sem custo de frete.');
+    if (FRETE_GRATIS.includes(c.freteTipo)) linhas.push('A entrega é por nossa conta, sem custo de frete.');
     if (c.freteTipo === 'cliente') linhas.push('O frete fica por sua conta: você combina a retirada aqui na loja e a gente entrega tudo embalado.');
     if (c.obs) linhas.push(c.obs);
     linhas.push(`Orçamento válido por ${c.dias} ${c.dias === 1 ? 'dia' : 'dias'}.`);
@@ -273,20 +290,30 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
     return linhas.join('\n').replace(/\n{3,}/g, '\n\n').trim();
   }
 
+  const usadasAcrescimo = (ops) => Math.max(0, ...ops.filter((o) => o.itens.length).map((o) => o.itens.reduce((a, it) => a + (it.acrescimo || 0), 0)));
   function atualizar() {
     const ops = lerOpcoes();
     const c = condicoes();
     $('[data-frete-valor]', form).hidden = c.freteTipo !== 'valor';
+    $('[data-frete-calc]', form).hidden = c.freteTipo !== 'diluido';
+    if (c.freteTipo === 'diluido') {
+      const acresc = usadasAcrescimo(ops);
+      $('[data-frete-info]', form).textContent = c.lagoaSanta
+        ? 'Entrega em Lagoa Santa: grátis de verdade, sem acréscimo no preço.'
+        : c.freteKm == null ? `Calcule ou digite os km. O frete é km de ida x 2 (ida e volta) x ${brl(valorKm)} por km.`
+          : `Frete ${brl(c.freteCusto)} (${String(c.freteKm).replace('.', ',')} km x 2 x ${brl(valorKm)}/km), diluído nos itens${acresc ? `: +${brl(acresc)} no total depois do arredondamento para 9,90` : ''}. Não aparece na mensagem.`;
+    }
     const usadas = ops.filter((o) => o.itens.length);
     $('[data-totais]', form).innerHTML = String(usadas.length ? h`${usadas.map((op) => {
       const total = op.subtotal + c.freteValor;
       return h`<div class="hd"><span class="clr" style="font-weight:600">${op.titulo || 'Total'}</span><span style="text-align:right"><span class="num" style="font-size:26px">${brl(total)}</span><span class="sub">${c.parcelas}x de ${brl(total / c.parcelas)} sem juros ou à vista</span></span></div>`;
-    })}${c.freteValor > 0 ? h`<span class="mut" style="font-size:12px">Inclui frete de ${brl(c.freteValor)}.</span>` : ''}` : h`<span class="mut">Escolha os produtos para ver o total.</span>`);
+    })}${c.freteValor > 0 ? h`<span class="mut" style="font-size:12px">Inclui frete de ${brl(c.freteValor)}.</span>` : ''}${c.freteCusto > 0 ? h`<span class="mut" style="font-size:12px">Já com o frete de ${brl(c.freteCusto)} diluído nos itens (o cliente vê frete grátis).</span>` : ''}` : h`<span class="mut">Escolha os produtos para ver o total.</span>`);
     const avisos = [];
     usadas.forEach((op) => op.itens.forEach((it) => {
       if (it.encomenda) avisos.push(`${op.titulo ? op.titulo + ': ' : ''}${it.produto} ${it.tamanho} sem estoque, é sob encomenda (até 25 dias, normalmente uns 10 dias úteis). Isso não vai na mensagem.`);
-      if (!termina990(it.preco)) avisos.push(`${it.produto} ${it.tamanho}: o preço ${brl(it.preco)} não termina em 9,90.`);
-      if (it.preco < it.preco_tabela && !it.black) avisos.push(`${it.produto} ${it.tamanho}: preço abaixo da tabela (${brl(it.preco_tabela)}).`);
+      const base = it.preco_base ?? it.preco;
+      if (!termina990(base)) avisos.push(`${it.produto} ${it.tamanho}: o preço ${brl(base)} não termina em 9,90.`);
+      if (base < it.preco_tabela && !it.black) avisos.push(`${it.produto} ${it.tamanho}: preço abaixo da tabela (${brl(it.preco_tabela)}).`);
     }));
     $('[data-avisos]', form).innerHTML = String(h`${avisos.map((a) => h`<p class="alerta-txt" style="margin:0;font-size:13px">${a}</p>`)}`);
     if (!mensagemEditada) form.mensagem.value = usadas.length ? montarMensagem(ops, c) : '';
@@ -311,7 +338,7 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
         <div class="tot"><div><span class="lb">Total</span><span class="vl">${brl(total)}</span></div>
           <div class="cond">em até <b>${c.parcelas}x de ${brl(total / c.parcelas)}</b> sem juros no cartão<br>ou <b>${brl(total)}</b> à vista (Pix, dinheiro ou débito)</div></div></section>`;
     }).join('');
-    const obsFrete = c.freteTipo === 'cliente' ? 'Frete por conta do cliente (retirada na loja).' : c.freteTipo === 'gratis' ? 'Entrega sem custo de frete.' : '';
+    const obsFrete = c.freteTipo === 'cliente' ? 'Frete por conta do cliente (retirada na loja).' : FRETE_GRATIS.includes(c.freteTipo) ? 'Entrega sem custo de frete.' : '';
     const html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="utf-8"><title>Orçamento LS Colchões - ${esc(nome)}</title>
       <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
       <style>
@@ -358,7 +385,8 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
   form.addEventListener('input', (e) => {
     if (e.target.matches('[data-busca-cliente]')) return buscarCliente(e.target.value);
     if (e.target.name === 'mensagem') { mensagemEditada = true; return; }
-    if (e.target.matches('[data-qtd], [data-preco], [name=frete_valor], [name=parcelas], [name=validade], [name=obs], [name=c_nome]')) atualizar();
+    if (e.target.name === 'frete_destino') freteCidade = '';
+    if (e.target.matches('[data-qtd], [data-preco], [name=frete_valor], [name=frete_km], [name=frete_destino], [name=parcelas], [name=validade], [name=obs], [name=c_nome]')) atualizar();
   });
   form.addEventListener('change', (e) => {
     const item = e.target.closest('[data-item]');
@@ -399,6 +427,17 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
       window.open(link, '_blank');
     }
     if (a === 'pdf') gerarPdf();
+    if (a === 'calc-km') {
+      const btn = e.target.closest('[data-acao]');
+      btn.disabled = true; btn.textContent = 'Calculando…';
+      try {
+        const r = await distanciaKm(form.frete_destino.value);
+        form.frete_km.value = r.km; freteCidade = r.cidade;
+        atualizar();
+        toast(`${r.km.toLocaleString('pt-BR')} km até ${r.cidade || 'o destino'}. Confira e ajuste se precisar.`, 'ok');
+      } catch (err) { toast(err.message, 'erro'); }
+      btn.disabled = false; btn.textContent = 'Calcular km';
+    }
   });
 
   form.addEventListener('submit', async (e) => {
@@ -411,6 +450,7 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
       if (!cliente && !(clienteNovo && form.c_nome?.value.trim())) throw new Error('Escolha ou cadastre o cliente.');
       if (!ops.length) throw new Error('Inclua pelo menos um produto com tamanho.');
       if (c.freteTipo === 'valor' && !c.freteValor) throw new Error('Informe o valor do frete.');
+      if (c.freteTipo === 'diluido' && c.freteKm == null && !c.lagoaSanta) throw new Error('Calcule ou digite os km até o cliente.');
       botao.disabled = true; botao.textContent = 'Salvando…';
       if (!cliente) {
         const novo = await painel.clientes.salvar({ nome: form.c_nome.value.trim(), whatsapp: form.c_whatsapp.value || null, origem: 'whatsapp' });
@@ -422,7 +462,8 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
       const salvo = await painel.orcamentos.salvar({
         ...(ex ? { id: ex.id } : {}),
         cliente_id: cliente.id, lead_id: leadId, opcoes,
-        frete_tipo: c.freteTipo, frete_valor: c.freteValor, parcelas: c.parcelas,
+        frete_tipo: c.freteTipo, frete_valor: c.freteTipo === 'diluido' ? c.freteCusto : c.freteValor, parcelas: c.parcelas,
+        frete_km: c.freteTipo === 'diluido' ? c.freteKm : null, frete_destino: c.freteTipo === 'diluido' ? c.freteDestino || null : null,
         validade: somaDiasData(c.dias), observacoes: c.obs || null, mensagem: form.mensagem.value, total,
         status: form.status?.value || ex?.status || 'enviado'
       });
@@ -443,7 +484,8 @@ export async function novoOrcamento(ctx, aoSalvar = () => {}, pre = {}) {
   // ---------------- início ----------------
   renderCliente();
   if (ex?.opcoes?.length) {
-    ex.opcoes.forEach((op) => novaOpcao(op.itens || []));
+    // Itens com frete diluído voltam com o preço original (o frete é diluído de novo na tela)
+    ex.opcoes.forEach((op) => novaOpcao((op.itens || []).map((i) => ({ ...i, preco: i.preco_base ?? i.preco }))));
     form.validade.value = ex.validade ? Math.max(1, Math.round((new Date(ex.validade) - new Date(ex.criado_em.slice(0, 10))) / 864e5)) : 3;
     if (ex.mensagem) { form.mensagem.value = ex.mensagem; mensagemEditada = true; }
     atualizar();

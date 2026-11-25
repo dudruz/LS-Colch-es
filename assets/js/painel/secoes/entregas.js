@@ -2,6 +2,7 @@
 import { painel, fmt, hojeSP, somaDias } from '../../api.js';
 import { h, raw, $, $$, debounce } from '../../html.js';
 import { icp, ROT, opcoes, pill, toast, modal, carregando, vazio, erroBloco, localParaIso, isoParaLocal, ymdSP, zapCliente } from '../ui.js';
+import { custoFrete, arred990, distanciaKm, ehLagoaSanta } from '../frete.js';
 
 const DIAS = ['DOM', 'SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB'];
 const ENDERECO_LOJA = 'Av. Pref. João Daher, 1277, Lagoa Santa, MG';
@@ -19,7 +20,7 @@ export default async function entregas(el, ctx) {
 
   el.innerHTML = String(h`
     <div class="cabeca"><div><h1>Entregas e agenda</h1><p>Marque a entrega como concluída para dar baixa no estoque automaticamente.</p></div>
-      ${ctx.pode.vender ? h`<button class="btn btn-g" data-acao="agendar">${icp.mais()} Agendar</button>` : ''}</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-acao="frete">${icp.mapa()} Calcular frete</button>${ctx.pode.vender ? h`<button class="btn btn-g" data-acao="agendar">${icp.mais()} Agendar</button>` : ''}</div></div>
     <div class="card pilha">
       <div class="hd">
         <div style="display:flex;align-items:center;gap:8px"><button class="btn btn-i" data-semana="-7" aria-label="Semana anterior">${icp.esq()}</button><button class="btn btn-p" data-semana="0">Hoje</button><button class="btn btn-i" data-semana="7" aria-label="Próxima semana">${icp.dir()}</button><h2 class="ttl" data-titulo style="margin-left:8px"></h2></div>
@@ -116,6 +117,7 @@ export default async function entregas(el, ctx) {
     if (c) { ev.preventDefault(); return concluir(c.dataset.concluir, c); }
     const en = t.closest('[data-entrega]');
     if (en) { const e = lista.find((x) => x.id === en.dataset.entrega); if (e && ctx.pode.vender && (await agendarEntrega(ctx, {}, e))) carregar(); return; }
+    if (t.closest('[data-acao="frete"]')) return calculadoraFrete(ctx);
     if (t.closest('[data-acao="agendar"]')) { if (await agendarEntrega(ctx, { quando: dia })) carregar(); return; }
     const sub = t.closest('[data-subir]'), des = t.closest('[data-descer]');
     if (sub || des) {
@@ -202,4 +204,66 @@ export async function agendarEntrega(ctx, pre = {}, existente = null) {
   });
   if (r) ctx.atualizarContadores?.();
   return Boolean(r);
+}
+
+/** Calculadora de frete: km da loja até o cliente, custo ida e volta e o preço com frete grátis (diluído). */
+export async function calculadoraFrete(ctx) {
+  const brl = (v) => fmt.reaisCentavos(v);
+  let valorKm = await painel.frete.valorKm().catch(() => 2);
+  let cidade = '';
+  await modal({
+    titulo: 'Calculadora de frete',
+    largura: 560,
+    confirmar: ctx.pode.admin ? 'Salvar valor do km' : null,
+    corpo: h`<div class="pilha" style="gap:14px">
+      <p class="mut" style="margin:0;font-size:13px">O freteiro cobra por km rodado, ida e volta. Dentro de Lagoa Santa a entrega é grátis e não soma nada no preço.</p>
+      <label class="lbl">Destino <small class="mut">(endereço, cidade ou CEP)</small><span style="display:flex;gap:8px"><input class="inp" name="destino" placeholder="Ex.: Rua X, 100, Vespasiano ou 33200-000" autocomplete="off"><button type="button" class="btn" data-calc style="flex:none">Calcular km</button></span></label>
+      <div class="g2">
+        <label class="lbl">Km até o cliente <small class="mut">(só ida)</small><input class="inp" name="km" type="number" min="0" step="0.1"></label>
+        <label class="lbl">Valor por km (R$)<input class="inp" name="valor_km" type="number" min="0" step="0.01" value="${valorKm.toFixed(2)}" ${ctx.pode.admin ? '' : raw('readonly')}></label>
+        <label class="lbl" style="grid-column:1/-1">Valor dos produtos <small class="mut">(opcional, pra ver o preço com frete grátis)</small><input class="inp" name="pedido" type="number" min="0" step="0.01" placeholder="Ex.: 2379.80"></label>
+      </div>
+      <div class="card realce pilha" style="padding:16px;gap:6px" data-res><span class="mut">Digite o destino e clique em Calcular km, ou digite os km.</span></div>
+    </div>`,
+    aoAbrir(form) {
+      const res = $('[data-res]', form);
+      const render = () => {
+        const km = form.km.value === '' ? null : Number(form.km.value) || 0;
+        const vk = Number(form.valor_km.value) || valorKm;
+        const ref = cidade || form.destino.value;
+        if (ehLagoaSanta(ref)) { res.innerHTML = String(h`<strong class="clr">Lagoa Santa: frete grátis</strong><span class="mut" style="font-size:13px">Não soma nada no preço.</span>`); return; }
+        if (km == null) { res.innerHTML = String(h`<span class="mut">Digite o destino e clique em Calcular km, ou digite os km.</span>`); return; }
+        const frete = custoFrete(km, vk, ref);
+        const pedido = Number(form.pedido.value) || 0;
+        const comFrete = pedido > 0 ? arred990(pedido + frete) : null;
+        res.innerHTML = String(h`<div class="hd"><span class="clr" style="font-weight:600">Frete (ida e volta)</span><span class="num" style="font-size:26px">${brl(frete)}</span></div>
+          <span class="mut" style="font-size:13px">${String(km).replace('.', ',')} km de ida x 2 = ${String(Math.round(km * 20) / 10).replace('.', ',')} km rodados x ${brl(vk)}/km</span>
+          ${comFrete ? h`<div class="hd" style="margin-top:6px"><span class="clr" style="font-weight:600">Preço com frete grátis</span><span class="num" style="font-size:22px">${brl(comFrete)}</span></div>
+          <span class="mut" style="font-size:13px">${brl(pedido)} + frete, arredondado para 9,90. No orçamento, escolha “Frete grátis (calcula e dilui no preço)” que ele divide o frete entre os itens.</span>` : ''}`);
+      };
+      form.addEventListener('input', (e) => { if (e.target.name === 'destino') cidade = ''; render(); });
+      form.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' || e.target.name === 'valor_km') return;
+        e.preventDefault();
+        if (e.target.name === 'destino') $('[data-calc]', form).click();
+      });
+      $('[data-calc]', form).addEventListener('click', async (e) => {
+        const b = e.currentTarget;
+        b.disabled = true; b.textContent = 'Calculando…';
+        try {
+          const r = await distanciaKm(form.destino.value);
+          form.km.value = r.km; cidade = r.cidade; render();
+          toast(`${r.km.toLocaleString('pt-BR')} km até ${r.cidade || 'o destino'}. Confira e ajuste se precisar.`, 'ok');
+        } catch (err) { toast(err.message, 'erro'); }
+        b.disabled = false; b.textContent = 'Calcular km';
+      });
+    },
+    async aoConfirmar(f) {
+      const v = Number(f.get('valor_km'));
+      if (!(v > 0)) throw new Error('Informe o valor por km.');
+      await painel.frete.salvarValorKm(v);
+      valorKm = v;
+      toast(`Valor do km salvo: ${brl(v)}.`, 'ok');
+    }
+  });
 }
