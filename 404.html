@@ -21,5 +21,12 @@
     <p>O endereço pode ter mudado. Volte para o início e continue de onde parou.</p>
     <a href="/">Ir para o início</a>
   </main>
+  <script>
+    // produto que ainda não ganhou página estática: abre pela página dinâmica
+    (function () {
+      var m = location.pathname.match(/^\/(colchoes|conjuntos-box|box-bau|bases|travesseiros|acessorios)\/([a-z0-9-]+)\/?$/);
+      if (m) location.replace('/produto.html?p=' + m[2] + '&fica=1');
+    })();
+  </script>
 </body>
 </html>

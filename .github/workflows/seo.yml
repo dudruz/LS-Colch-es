@@ -1,0 +1,47 @@
+# Gera as páginas de SEO (produtos, categorias, cidades, guias, sitemap) a partir do Supabase.
+# Roda todo dia de manhã, quando o conteúdo de SEO muda, ou manualmente em Actions → "SEO · gerar páginas" → Run workflow.
+name: SEO · gerar páginas
+
+on:
+  schedule:
+    - cron: '17 9 * * *' # 06:17 em Brasília
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'ferramentas/seo/**'
+      - 'assets/js/config.js'
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: seo
+  cancel-in-progress: false
+
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Gerar páginas
+        run: node ferramentas/seo/gerar.mjs
+      - name: Salvar no repositório
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "LS SEO"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nada mudou."
+            exit 0
+          fi
+          git commit -m "SEO: páginas atualizadas a partir do painel"
+          git push
+          # commit feito pelo próprio Action não dispara o GitHub Pages sozinho: pede a publicação
+          gh api -X POST "repos/${{ github.repository }}/pages/builds" || echo "Não consegui pedir a publicação do Pages (ela acontece no próximo push)."

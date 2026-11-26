@@ -23,7 +23,7 @@ function render() {
   const v = p.variacoes[tam];
   const midias = p.midias.length ? p.midias : [null];
   $('#produto').innerHTML = String(h`
-  <nav class="trilha" aria-label="Você está em"><a href="index.html">Início</a><span aria-hidden="true">/</span><a href="catalogo.html${p.categoria_slug ? '?categoria=' + p.categoria_slug : ''}">${p.categoria || 'Colchões'}</a><span aria-hidden="true">/</span><span aria-current="page">${p.nome}</span></nav>
+  <nav class="trilha" aria-label="Você está em"><a href="index.html">Início</a><span aria-hidden="true">/</span><a href="${p.categoria_slug ? '/' + p.categoria_slug + '/' : 'catalogo.html'}">${p.categoria || 'Colchões'}</a><span aria-hidden="true">/</span><span aria-current="page">${p.nome}</span></nav>
   <div class="produto" style="margin-top:28px">
     <div class="galeria">
       <div class="foto-principal">${midia(midias[foto])}${p.selo ? h`<span class="selo-card" style="left:20px;right:auto;top:20px">${SELOS[p.selo]}</span>` : ''}</div>
@@ -120,12 +120,21 @@ function renderRelacionados() {
 
 (async () => {
   await iniciarPagina('colchoes');
-  const slug = new URLSearchParams(location.search).get('p');
+  // página estática (/categoria/produto/) traz o slug no body; a antiga usa produto.html?p=slug
+  const params = new URLSearchParams(location.search);
+  const estatica = document.body.dataset.slug;
+  const slug = estatica || params.get('p');
   try {
     p = slug ? await site.produto(slug) : null;
   } catch (e) {
     p = null;
   }
+  // endereço antigo → página estática (fica=1 vem do 404 quando a página ainda não foi gerada)
+  if (p && !estatica && p.categoria_slug && !params.has('fica')) {
+    location.replace(`/${p.categoria_slug}/${p.slug}/`);
+    return;
+  }
+  if (!p && estatica) return; // sem conexão: mantém o conteúdo estático
   if (!p) {
     $('#produto').innerHTML = String(h`<div class="vazio" style="margin:40px 0"><h1 class="serif" style="color:var(--navy);font-weight:500">Produto não encontrado</h1><p>Ele pode ter saído do catálogo. Veja os outros modelos ou fale com a gente.</p><a class="btn btn-navy" href="catalogo.html">Ver colchões</a></div>`);
     return;
