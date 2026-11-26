@@ -407,3 +407,12 @@ button { font: inherit; }
 .benef.destaque .icone-box { background: var(--ouro); color: var(--navy); }
 .benef.destaque h3 { color: var(--navy); }
 @media (max-width: 1180px) { .topo-parcela { display: none; } }
+
+/* Tour LS (chamada na home) */
+.tour-home .duas-col > .tour-home-img { flex: 0 1 300px; }
+.tour-home-img { position: relative; display: block; max-width: 300px; margin: 0 auto; border-radius: 18px; overflow: hidden;
+  box-shadow: 0 0 0 4px var(--noite), 0 0 0 6px var(--ouro), var(--sombra); transition: transform .3s var(--ease); }
+.tour-home-img:hover { transform: translateY(-4px) rotate(-1deg); }
+.tour-home-img img { width: 100%; height: auto; image-rendering: pixelated; }
+.tour-home-play { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); padding: 10px 22px; font: 600 14px/1 var(--sans);
+  letter-spacing: .2em; color: var(--navy); background: var(--ouro); border-radius: 999px; }
