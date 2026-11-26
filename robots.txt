@@ -1,0 +1,7 @@
+# LS Colchões: buscadores e assistentes de IA são bem-vindos
+User-agent: *
+Allow: /
+Disallow: /painel/
+Disallow: /ferramentas/
+
+Sitemap: https://lscolchoes.com.br/sitemap.xml

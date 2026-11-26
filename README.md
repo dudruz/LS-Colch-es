@@ -118,6 +118,27 @@ npx serve .
 
 ---
 
+## SEO: páginas geradas
+
+O site é montado no navegador, então o Google enxerga pouco dele. Para resolver, `ferramentas/seo/gerar.mjs` lê os produtos **visíveis no site** pelo Supabase e gera páginas HTML prontas:
+
+| Endereço | O que é |
+|---|---|
+| `/colchoes/`, `/box-bau/`… | Uma página por categoria que tem produto visível |
+| `/colchoes/<produto>/` | Página de cada produto (o `produto.html?p=` antigo redireciona para ela) |
+| `/colchoes-em-<cidade>/` | Cidades atendidas (texto em `ferramentas/seo/conteudo.mjs`) |
+| `/guia/…` | Guias de compra (medidas, molas x espuma, como escolher) |
+| `sitemap.xml`, `robots.txt` | Gerados juntos |
+
+Também atualiza o bloco `<!--seo-->` do `<head>` das páginas fixas (canonical, imagem de compartilhamento e dados da loja para o Google).
+
+- **Atualiza sozinho** todo dia às 6h17 pelo GitHub Action `SEO · gerar páginas`. Para atualizar na hora (ex.: produto novo marcado como visível no painel), abra **Actions → SEO · gerar páginas → Run workflow**.
+- Rodar no computador: `node ferramentas/seo/gerar.mjs` (Node 20+, sem instalar nada).
+- Produto oculto no painel some da página e do sitemap na próxima execução.
+- Mudou as cidades em `conteudo.mjs`? Atualize também a lista `CIDADES_SEO` no `assets/js/site/comum.js` (links do rodapé).
+
+---
+
 ## Como o painel funciona no dia a dia
 
 | Área | O que dá para fazer |

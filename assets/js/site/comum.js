@@ -121,6 +121,9 @@ function faixaCampanha(c) {
   </div>`;
 }
 
+// páginas de cidade geradas por ferramentas/seo (manter igual a CIDADES em conteudo.mjs)
+const CIDADES_SEO = [['vespasiano', 'Vespasiano'], ['confins', 'Confins'], ['sao-jose-da-lapa', 'São José da Lapa'], ['pedro-leopoldo', 'Pedro Leopoldo'], ['santa-luzia', 'Santa Luzia'], ['jaboticatubas', 'Jaboticatubas'], ['matozinhos', 'Matozinhos'], ['ribeirao-das-neves', 'Ribeirão das Neves'], ['belo-horizonte', 'Belo Horizonte'], ['sete-lagoas', 'Sete Lagoas']];
+
 function rodape() {
   const c = cfg();
   return h`
@@ -133,6 +136,7 @@ function rodape() {
     <nav aria-label="Rodapé">
       <h2>NAVEGUE</h2>
       ${PAGINAS.map(([, nome, href]) => h`<a href="${href}">${nome}</a>`)}
+      <a href="/guia/">Guias de compra</a>
     </nav>
     <div>
       <h2>VISITE A LOJA</h2>
@@ -147,6 +151,7 @@ function rodape() {
       ${c.instagram ? h`<a href="https://instagram.com/${String(c.instagram).replace('@', '')}" target="_blank" rel="noopener" style="margin-top:8px;color:#E8D6A8">${ic.insta(18)} ${c.instagram}</a>` : ''}
     </div>
   </div>
+  <p class="rodape-cidades">Atendemos Lagoa Santa e região: ${CIDADES_SEO.map(([slug, nome], i) => h`${i ? ' · ' : ''}<a href="/colchoes-em-${slug}/">${nome}</a>`)}</p>
   <svg class="rodape-ondas" viewBox="0 0 1440 48" preserveAspectRatio="none" fill="none" stroke="#C9A65A" stroke-width="1.2" aria-hidden="true"><path stroke-opacity=".16" d="M0 18C120 2 240 2 360 18S600 34 720 18 960 2 1080 18 1320 34 1440 18"/><path stroke-opacity=".09" d="M0 38C120 22 240 22 360 38S600 54 720 38 960 22 1080 38 1320 54 1440 38"/></svg>
   <div class="rodape-base">
     <span>© ${new Date().getFullYear()} LS Colchões · CNPJ 68.020.458/0001-46</span>
@@ -204,8 +209,10 @@ export const nomeFirmeza = (n) => FIRMEZA[n] || '';
 export function barrasFirmeza(n) {
   return h`<span class="barras" aria-hidden="true">${[1, 2, 3, 4, 5].map((i) => h`<i class="${i <= (n || 0) ? 'on' : ''}"></i>`)}</span>`;
 }
+/** Endereço do produto: página estática gerada para SEO (/categoria/produto/) */
+export const urlProduto = (p) => (p.categoria_slug ? `/${p.categoria_slug}/${p.slug}/` : `produto.html?p=${encodeURIComponent(p.slug)}`);
 export function cardProduto(p, classe = '') {
-  const url = `produto.html?p=${encodeURIComponent(p.slug)}`;
+  const url = urlProduto(p);
   const msg = `Olá! Vi o ${p.nome} no site e quero saber mais.`;
   return h`
   <article class="card-prod ${classe}" data-vis>

@@ -53,7 +53,7 @@ function montarHero(d) {
     <div class="slide" role="group" aria-roledescription="slide" aria-label="${i + 1} de ${banners.length}" ${i ? raw('hidden') : ''}>
       <div class="slide-txt entra">
         <p class="eyebrow claro">${b.eyebrow || ''}</p>
-        ${i === 0 ? h`<h1>${b.titulo_1}${b.titulo_2 ? h`<br><em>${b.titulo_2}</em>` : ''}</h1>` : h`<h2 class="hero-h" style="margin:24px 0 0;font-family:var(--serif);font-weight:500;font-size:clamp(46px,5.6vw,82px);line-height:1.02;color:#fff">${b.titulo_1}${b.titulo_2 ? h`<br><em style="color:#E8D6A8">${b.titulo_2}</em>` : ''}</h2>`}
+        ${i === 0 ? h`<h2 class="hero-titulo">${b.titulo_1}${b.titulo_2 ? h`<br><em>${b.titulo_2}</em>` : ''}</h2>` : h`<h2 class="hero-h" style="margin:24px 0 0;font-family:var(--serif);font-weight:500;font-size:clamp(46px,5.6vw,82px);line-height:1.02;color:#fff">${b.titulo_1}${b.titulo_2 ? h`<br><em style="color:#E8D6A8">${b.titulo_2}</em>` : ''}</h2>`}
         ${b.texto ? h`<p>${b.texto}</p>` : ''}
         <div class="acoes">
           <a class="btn btn-ouro btn-g pulsa" href="${dst.href}" ${dst.externo ? raw('target="_blank" rel="noopener"') : ''} ${dst.zap ? raw('data-zap') : ''}>${b.botao_texto || 'Saiba mais'} ${ic.seta()}</a>
