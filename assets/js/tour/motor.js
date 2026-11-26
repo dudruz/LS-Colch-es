@@ -97,14 +97,14 @@ function distRect(px, py, r) {
 export class Jogo {
   constructor(canvas, produtos, cb = {}) {
     this.cv = canvas; this.c = canvas.getContext('2d'); this.c.imageSmoothingEnabled = false;
-    canvas.width = LARG; canvas.height = ALT;
+    this.alt = ALT; canvas.width = LARG; canvas.height = ALT;
     this.cb = cb;
     this.m = construirMundo(produtos);
     this.fundo = desenharEstatico(this.m);
     this.S = criarSprites();
     const [x, y] = this.m.inicio;
     this.pl = { x, y, dir: 'up', t: 0, anda: false, estado: 'livre' };
-    this.cam = Math.max(0, this.m.H - ALT);
+    this.cam = Math.max(0, this.m.H - this.alt);
     this.teclas = new Set(); this.toque = { up: 0, down: 0, left: 0, right: 0 };
     this.pausado = true; this.feliz = false; this.alvo = null; this.zona = null;
     this.destaques = new Set(); this.festaAte = 0; this.t = 0;
@@ -114,6 +114,12 @@ export class Jogo {
   iniciar() { this.pausado = false; this.ultimo = performance.now(); requestAnimationFrame(this._loop); }
   pausar(v) { this.pausado = v; if (!v) { this.teclas.clear(); this._desde = {}; } }
   set humor(feliz) { this.feliz = feliz; }
+  /** Altura da tela em px do jogo (a largura é sempre 180). Na tela cheia do celular a loja estica até o fim da tela. */
+  redimensionar(alt) {
+    alt = Math.round(Math.max(ALT, Math.min(440, alt)));
+    if (alt === this.alt) return;
+    this.alt = alt; this.cv.height = alt; this.c.imageSmoothingEnabled = false;
+  }
 
   // ---------- controles ----------
   tecla(e, baixo) {
@@ -153,7 +159,7 @@ export class Jogo {
   destacar(ids) { this.destaques = new Set(ids); }
   festa(seg = 3) { this.festaAte = this.t + seg; }
   irPara(item) { // leva a câmera até o produto (usado pela indicação do Dudu)
-    this.cam = Math.max(-46, Math.min(this.m.H - ALT, item.y - 160));
+    this.cam = Math.max(-46, Math.min(this.m.H - this.alt, item.y - 160));
   }
 
   // ---------- atualização ----------
@@ -193,7 +199,7 @@ export class Jogo {
       pl.t += dt;
     }
     // câmera suave
-    const alvoCam = Math.max(-46, Math.min(this.m.H - ALT, pl.y - 196)); // -46: o HUD não cobre o balcão
+    const alvoCam = Math.max(-46, Math.min(this.m.H - this.alt, pl.y - Math.round(this.alt * 0.6))); // -46: o HUD não cobre o balcão
     this.cam += (alvoCam - this.cam) * Math.min(1, dt * 8);
     // o que está perto para interagir
     let melhor = null, dMin = ALCANCE;
@@ -211,7 +217,7 @@ export class Jogo {
   // ---------- desenho ----------
   _desenhar() {
     const c = this.c, cam = Math.round(this.cam), t = this.t, pl = this.pl;
-    c.fillStyle = '#E8E8E6'; c.fillRect(0, 0, LARG, ALT);
+    c.fillStyle = '#E8E8E6'; c.fillRect(0, 0, LARG, this.alt);
     c.drawImage(this.fundo, 0, -cam);
     c.save(); c.translate(0, -cam);
     for (const it of this.m.itens) if (it.aberto > 0) bau(c, it.x, it.y, it.lado, it.p, it.aberto);
@@ -259,7 +265,7 @@ export class Jogo {
     if (t < this.festaAte) {
       for (let i = 0; i < 40; i++) {
         const x = (i * 47 + 13) % LARG, sp = 60 + (i * 37) % 80;
-        const y = ((i * 71 + (t * sp)) % (ALT + 20)) - 10;
+        const y = ((i * 71 + (t * sp)) % (this.alt + 20)) - 10;
         c.fillStyle = [COR.ouro, COR.ouroClaro, COR.royal][i % 3];
         c.fillRect(x, Math.round(y), (Math.floor(t * 10) + i) % 2 ? 2 : 1, 2);
       }

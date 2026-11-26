@@ -62,7 +62,8 @@ async function iniciar() {
 function comecar() {
   $('.t-inicio').hidden = true;
   document.body.classList.add('jogando');
-  tela().scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (ehCelular()) entrarTelaCheia();
+  else tela().scrollIntoView({ behavior: 'smooth', block: 'center' });
   $('.t-hud').hidden = false;
   if (matchMedia('(pointer: coarse)').matches) $('.t-controles').hidden = false;
   st.jogo.pausar(false);
@@ -70,6 +71,51 @@ function comecar() {
   toast('Missão: deite num colchão, abra um baú, conheça os travesseiros e fale com o Dudu');
   tela().focus({ preventScroll: true });
 }
+
+// ---------------------------------------------------------------------
+// Tela cheia no celular: usa a tela cheia do navegador quando ele deixa
+// (Android) e, sempre, ocupa a tela inteira com a loja esticada na altura
+// ---------------------------------------------------------------------
+const ehCelular = () => matchMedia('(pointer: coarse)').matches && Math.min(screen.width, screen.height) < 820;
+let telaCheiaNativa = false;
+function entrarTelaCheia() {
+  const caixa = $('#tour');
+  caixa.classList.add('tela-cheia');
+  document.documentElement.classList.add('tour-sem-rolagem');
+  $('.t-sair').hidden = false;
+  try {
+    const pedir = caixa.requestFullscreen?.bind(caixa) || caixa.webkitRequestFullscreen?.bind(caixa);
+    const r = pedir?.({ navigationUI: 'hide' });
+    if (r?.then) r.then(() => { telaCheiaNativa = true; screen.orientation?.lock?.('portrait').catch(() => {}); }).catch(() => {});
+  } catch { /* navegador sem tela cheia (iPhone): fica só o modo que ocupa a tela */ }
+  ajustarTela();
+}
+function sairTelaCheia() {
+  const caixa = $('#tour');
+  caixa.classList.remove('tela-cheia');
+  document.documentElement.classList.remove('tour-sem-rolagem');
+  $('.t-sair').hidden = true;
+  const t = tela(); t.style.width = ''; t.style.aspectRatio = '';
+  st.jogo?.redimensionar(320);
+  if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen)?.call(document)?.catch?.(() => {});
+  telaCheiaNativa = false;
+  t.scrollIntoView({ block: 'center' });
+}
+function ajustarTela() {
+  if (!$('#tour').classList.contains('tela-cheia') || !st.jogo) return;
+  const w = window.visualViewport?.width || innerWidth, h = window.visualViewport?.height || innerHeight;
+  st.jogo.redimensionar(180 * h / w);
+  const alt = st.jogo.alt, t = tela();
+  t.style.aspectRatio = `180 / ${alt}`;
+  t.style.width = `min(${Math.floor(w)}px, ${Math.floor(h * 180 / alt)}px)`;
+}
+['resize', 'orientationchange'].forEach((ev) => window.addEventListener(ev, () => setTimeout(ajustarTela, 60)));
+window.visualViewport?.addEventListener('resize', () => setTimeout(ajustarTela, 60));
+['fullscreenchange', 'webkitfullscreenchange'].forEach((ev) => document.addEventListener(ev, () => {
+  const ativo = document.fullscreenElement || document.webkitFullscreenElement;
+  if (!ativo && telaCheiaNativa) sairTelaCheia(); // saiu pelo botão voltar do celular
+  else setTimeout(ajustarTela, 60);
+}));
 
 // ---------------------------------------------------------------------
 // Controles: teclado, botões de toque e atalhos da interface
@@ -107,6 +153,7 @@ function ligarControles() {
     else if (a === 'lista') abrirLista();
     else if (a === 'som') { const v = somLigado(!somLigado()); b.setAttribute('aria-pressed', String(v)); b.textContent = v ? 'SOM' : 'MUDO'; if (v && !st.jogo.pausado) musica(true); }
     else if (a === 'fechar') fecharTudo();
+    else if (a === 'sair') sairTelaCheia();
   });
   const bs = $('[data-acao="som"]');
   bs.textContent = somLigado() ? 'SOM' : 'MUDO'; bs.setAttribute('aria-pressed', String(somLigado()));

@@ -153,6 +153,17 @@
 
 body.jogando .barra-cel, body.jogando .zap-flutuante { display: none !important; }
 
+/* ---------- tela cheia (celular) ---------- */
+html.tour-sem-rolagem, html.tour-sem-rolagem body { overflow: hidden; overscroll-behavior: none; }
+.tour.tela-cheia { position: fixed; inset: 0; z-index: 2147483000; width: auto; max-width: none; margin: 0;
+  display: flex; align-items: center; justify-content: center; background: #021A33;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+.tour.tela-cheia .tour-tela { border-radius: 0; box-shadow: none; max-height: 100%; }
+.tour:fullscreen { background: #021A33; }
+.t-sair { position: absolute; right: 3cqw; top: 21cqw; z-index: 2; font-size: 2.4cqw; padding: 1.6cqw 2.2cqw; color: #FAF8F2;
+  background: rgba(2, 26, 51, .88); border: .6cqw solid #161826; }
+.tela-cheia .t-toast { top: 31cqw; }
+
 @media (max-width: 720px) {
   .tour-sec { padding: 24px 0 64px; }
   .tour-palco { gap: 28px; }
