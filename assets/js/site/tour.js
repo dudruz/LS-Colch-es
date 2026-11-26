@@ -83,7 +83,7 @@ function ligarControles() {
     if (st.jogo && !st.jogo.pausado && st.jogo.tecla(e, true)) e.preventDefault();
   });
   document.addEventListener('keyup', (e) => { st.jogo?.tecla(e, false); });
-  window.addEventListener('blur', () => st.jogo?.teclas.clear());
+  window.addEventListener('blur', () => { if (st.jogo) { st.jogo.teclas.clear(); st.jogo._desde = {}; } });
 
   $$('.t-dpad button').forEach((b) => {
     const d = b.dataset.dir;
