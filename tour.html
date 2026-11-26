@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tour LS · Passeie pela loja em versão game · LS Colchões</title>
+<meta name="description" content="Tour virtual da LS Colchões em Lagoa Santa: ande pela loja em pixel art, veja colchões, bases baú e travesseiros com preço, converse com o Dudu e ganhe um travesseiro de brinde.">
+<meta name="theme-color" content="#062A4F">
+<link rel="icon" href="assets/img/ls-simbolo.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Montserrat:wght@400;500;600;700&display=swap">
+<link rel="preload" href="assets/fonts/press-start-2p.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/site.css">
+<link rel="stylesheet" href="assets/css/tour.css">
+</head>
+<body>
+<a class="pular" href="#tour">Pular para o jogo</a>
+<header id="topo"></header>
+<main id="conteudo">
+  <section class="sec tour-sec">
+    <div class="wrap tour-palco">
+      <div class="tour-texto">
+        <p class="eyebrow">Tour LS</p>
+        <h1 class="titulo escuro">Passeie pela loja <em>em versão game.</em></h1>
+        <p class="texto">Ande pelo corredor, deite nos colchões, abra os baús e converse com o Dudu, que te ajuda a escolher. Os preços são os mesmos da loja.</p>
+        <div class="tour-missao">
+          <p class="tour-missao-tit">Missão: a jornada do sono</p>
+          <ol>
+            <li>Deite num colchão</li>
+            <li>Abra um baú</li>
+            <li>Conheça os travesseiros</li>
+            <li>Converse com o Dudu</li>
+          </ol>
+          <p class="tour-premio">Completou? Ganha um <strong>Travesseiro Amore</strong> de brinde nas compras a partir de R$ 2.000.</p>
+        </div>
+        <p class="tour-ajuda"><strong>Como jogar:</strong> setas ou W A S D para andar, Espaço ou E para interagir, Esc para fechar. No celular, use os botões na tela.</p>
+        <p class="tour-ajuda">Prefere ver em lista? <a href="catalogo.html">Abra o catálogo</a> ou <a data-zap-msg="Olá! Vim pelo Tour LS do site e quero ajuda para escolher." target="_blank" rel="noopener">fale com um consultor</a>.</p>
+      </div>
+
+      <div class="tour" id="tour">
+        <div class="tour-tela" tabindex="0" aria-label="Jogo Tour LS. Use as setas para andar e Espaço para interagir.">
+          <canvas id="tour-canvas" width="180" height="320" role="img" aria-label="Loja LS Colchões em pixel art"></canvas>
+
+          <div class="t-hud" hidden>
+            <div class="t-energia"><span>ENERGIA</span><div class="t-barra"><i></i></div></div>
+            <div class="t-hud-btns">
+              <button type="button" data-acao="missao">MISSÃO <b>0/4</b></button>
+              <button type="button" data-acao="lista">LISTA <b>0</b></button>
+              <button type="button" data-acao="som" aria-pressed="true">SOM</button>
+            </div>
+          </div>
+          <div class="t-toast" role="status" hidden></div>
+          <div class="t-dica" hidden></div>
+
+          <div class="t-controles" hidden>
+            <div class="t-dpad">
+              <button type="button" data-dir="up" aria-label="Cima">▲</button>
+              <button type="button" data-dir="left" aria-label="Esquerda">◀</button>
+              <button type="button" data-dir="right" aria-label="Direita">▶</button>
+              <button type="button" data-dir="down" aria-label="Baixo">▼</button>
+            </div>
+            <div class="t-ab"><button type="button" class="t-b" aria-label="Fechar">B</button><button type="button" class="t-a" aria-label="Interagir">A</button></div>
+          </div>
+
+          <div class="t-inicio">
+            <div class="t-logo" aria-hidden="true"><span>LS</span><small>COLCHÕES</small></div>
+            <p class="t-tit">TOUR LS</p>
+            <p class="t-sub">A JORNADA DO SONO</p>
+            <p class="t-carregando">Abrindo a loja...</p>
+            <p class="t-erro" hidden><a href="catalogo.html">Ver o catálogo</a></p>
+            <button type="button" class="t-jogar" hidden>JOGAR</button>
+            <p class="t-pre">Ganhe um Travesseiro Amore de brinde*<br><small>*nas compras a partir de R$ 2.000</small></p>
+          </div>
+
+          <div class="t-painel" role="dialog" aria-modal="true" hidden></div>
+          <div class="t-dialogo" role="dialog" aria-label="Conversa com o Dudu" hidden></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<footer id="rodape"></footer>
+<script type="module" src="assets/js/site/tour.js"></script>
+</body>
+</html>

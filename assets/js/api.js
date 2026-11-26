@@ -132,6 +132,9 @@ export const site = {
     p_offset: f.offset || 0
   }).then(ok),
 
+  /** Tour LS (jogo): todos os produtos com preço, inclusive os ocultos do catálogo */
+  tour: () => supabase.rpc('site_tour').then(ok),
+
   /** Página de produto pelo slug (null se não existir ou estiver oculto) */
   produto: (slug) => supabase.rpc('site_produto', { p_slug: slug }).then(ok),
 
