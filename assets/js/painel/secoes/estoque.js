@@ -111,15 +111,19 @@ async function ajustar(l) {
   });
 }
 
+// Compra em caixa fechada: arredonda para cima até o múltiplo da caixa (ex.: travesseiros de 12 em 12).
+const emCaixas = (l, n) => { const m = Math.max(1, Number(l.multiplo_compra) || 1); return n > 0 ? Math.ceil(n / m) * m : 0; };
+
 // ---------------------------------------------------------------------
 // O que pedir: o que precisa ser comprado, já descontando o que está a caminho.
-// Sugestão = estoque mínimo + vendas dos últimos 30 dias − disponível − a caminho.
+// Sugestão = estoque mínimo + vendas dos últimos 30 dias − disponível − a caminho,
+// arredondada para cima até a caixa fechada quando o produto é comprado em caixa.
 async function comprar(corpo, ctx) {
   const f = { categoria: '' };
   let linhas = [];
   const qtdEditada = new Map();
   const marcados = new Set();
-  const sugestao = (l) => Math.max(0, (l.minimo || 0) + (l.vendidos_30d || 0) - l.disponivel - (l.a_caminho || 0));
+  const sugestao = (l) => emCaixas(l, Math.max(0, (l.minimo || 0) + (l.vendidos_30d || 0) - l.disponivel - (l.a_caminho || 0)));
   async function carregar() {
     try {
       linhas = (await painel.estoque.matriz()).filter((l) => l.ativo && sugestao(l) > 0);
@@ -150,7 +154,7 @@ async function comprar(corpo, ctx) {
             ${ctx.pode.admin ? h`<button class="btn btn-g" data-pedir ${selecionados.length ? '' : raw('disabled')}>${icp.mais()} Criar pedido com ${selecionados.length} item(ns)</button>` : ''}
           </div>
         </div>
-        <p class="mut" style="margin:0;font-size:13px">Sugestão = estoque mínimo + vendas dos últimos 30 dias − disponível − o que já está a caminho. Ajuste a quantidade antes de criar o pedido.</p>
+        <p class="mut" style="margin:0;font-size:13px">Sugestão = estoque mínimo + vendas dos últimos 30 dias − disponível − o que já está a caminho (produtos comprados em caixa são arredondados para a caixa fechada). Ajuste a quantidade antes de criar o pedido.</p>
         ${lista.length ? h`<div class="tabela"><table class="tbl"><thead><tr><th style="width:32px"><input type="checkbox" data-todos aria-label="Marcar todos" ${lista.every((l) => marcados.has(l.variacao_id)) ? raw('checked') : ''}></th><th>Produto</th><th>Tam.</th><th class="r">Estoque</th><th class="r">Reserv.</th><th class="r">Disp.</th><th class="r">A caminho</th><th class="r">Vend. 30d</th><th class="r">Mín.</th><th class="r">Pedir</th></tr></thead><tbody>
           ${lista.map((l) => h`<tr>
             <td><input type="checkbox" data-marca="${l.variacao_id}" ${marcados.has(l.variacao_id) ? raw('checked') : ''} aria-label="Incluir no pedido"></td>
@@ -286,7 +290,7 @@ export async function novoPedido(ctx, aoSalvar, itensIniciais = []) {
           const alertas = ativas.filter((l) => (l.minimo || 0) - l.disponivel - (l.a_caminho || 0) > 0);
           if (!alertas.length) return toast('Nenhum item abaixo do mínimo (contando o que já está a caminho).');
           $$('[data-item]', caixa).forEach((d) => { if (!$('[data-v]', d).value) d.remove(); });
-          alertas.forEach((l) => caixa.append(linhaItem(l.variacao_id, Math.max(1, l.minimo - l.disponivel - (l.a_caminho || 0)))));
+          alertas.forEach((l) => caixa.append(linhaItem(l.variacao_id, emCaixas(l, Math.max(1, l.minimo - l.disponivel - (l.a_caminho || 0))))));
         }
       });
     },
