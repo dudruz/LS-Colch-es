@@ -126,12 +126,16 @@ export class Jogo {
   direcaoToque(d, v) { this._segurar(this.toque, d, v, (x) => { this.toque[x] = 1; }, (x) => { this.toque[x] = 0; }); }
   // um toque rápido ainda dá um passo: a direção fica ativa por pelo menos 160 ms
   _segurar(alvo, d, baixo, liga, desliga) {
-    this._desde = this._desde || {};
+    this._desde = this._desde || {}; this._timers = this._timers || {};
     const k = (alvo === this.teclas ? 'k' : 't') + d;
-    if (baixo) { if (!this._desde[k]) { this._desde[k] = performance.now(); liga(d); } return; }
+    if (baixo) {
+      if (this._timers[k]) { clearTimeout(this._timers[k]); delete this._timers[k]; this._desde[k] = performance.now(); return; }
+      if (!this._desde[k]) { this._desde[k] = performance.now(); liga(d); }
+      return;
+    }
     const passou = performance.now() - (this._desde[k] || 0);
-    const soltar = () => { delete this._desde[k]; desliga(d); };
-    if (passou < 160) setTimeout(soltar, 160 - passou); else soltar();
+    const soltar = () => { delete this._desde[k]; delete this._timers[k]; desliga(d); };
+    if (passou < 160) this._timers[k] = setTimeout(soltar, 160 - passou); else soltar();
   }
   acao() {
     if (this.pausado || this.pl.estado !== 'livre') return;
